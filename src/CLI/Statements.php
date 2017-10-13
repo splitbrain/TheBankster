@@ -37,7 +37,16 @@ class Statements extends \splitbrain\phpcli\CLI
             /** @var AbstractBackend $backend */
             $backend = new $class($account['config']);
 
-            $backend->getStatements(new \DateTime());
+            $transactions = $backend->getTransactions(new \DateTime('2017-10-01'));
+
+            foreach($transactions as $tx) {
+                echo "--------------\n";
+                echo "(".$tx->getXName().")\n";
+                echo $tx->getDescription();
+                echo "\n----\n";
+                echo $tx->getCleanDescription();
+                echo "\n";
+            }
         }
 
 

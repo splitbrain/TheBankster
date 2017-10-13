@@ -2,6 +2,8 @@
 
 namespace splitbrain\TheBankster\Backend;
 
+use splitbrain\TheBankster\Transaction;
+
 abstract class AbstractBackend {
 
     protected $config;
@@ -12,13 +14,12 @@ abstract class AbstractBackend {
     }
 
     /**
-     * Retrun all statements since the given DateTime
+     * Return all statements since the given DateTime
      *
      * Backends that can not select by time should return as many statements as possible
-     * and ensure the TXID stays the same (already known transactions will be ignored)
      *
      * @param \DateTime $since
-     * @return array[]
+     * @return Transaction[]
      */
-    abstract public function getStatements(\DateTime $since);
+    abstract public function getTransactions(\DateTime $since);
 }

@@ -5,6 +5,7 @@ namespace splitbrain\TheBankster\Backend;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\RequestOptions;
+use splitbrain\TheBankster\Transaction;
 
 class TargoBank extends AbstractBackend
 {
@@ -37,7 +38,7 @@ class TargoBank extends AbstractBackend
     }
 
     /** @inheritdoc */
-    public function getStatements(\DateTime $since)
+    public function getTransactions(\DateTime $since)
     {
 
         if (!$this->login($this->config['user'], $this->config['pass'])) {
@@ -52,34 +53,27 @@ class TargoBank extends AbstractBackend
             throw new \Exception('Failed to parse account statements');
         }
 
-        $statements = array();
+        $transactions = array();
 
         $trs = $table->find('tr');
         foreach ($trs as $tr) {
             $tds = pq($tr)->find('td');
             if ($tds->length !== 6) continue;
 
-            // prepare statement
-            $statement = [
-                'date' => $this->fixDate($tds->get(0)->textContent),
-                'details' => $tds->get(1)->textContent,
-                'city' => $tds->get(2)->textContent,
-                'country' => $tds->get(3)->textContent,
-                'amount' => $this->fixAmount($tds->get(4)->textContent),
-                'foreign' => $tds->get(5)->textContent,
-            ];
-            // fake TXID
-            $statement['TXID'] = md5(join('-', [
-                $statement['date'],
-                $statement['details'],
-                $statement['amount'],
-            ]));
-
-            $statements[] = $statement;
+            $transactions[] = new Transaction(
+                $this->fixDate($tds->get(0)->textContent),
+                $this->fixAmount($tds->get(4)->textContent),
+                join("\n", [
+                    $tds->get(1)->textContent, // details
+                    $tds->get(2)->textContent, // city
+                    $tds->get(3)->textContent, // country
+                    $tds->get(5)->textContent, // foreign currency
+                ])
+            );
         }
 
-        print_r($statements);
-        return $statements;
+        print_r($transactions);
+        return $transactions;
     }
 
     /**
