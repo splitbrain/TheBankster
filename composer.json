@@ -1,0 +1,14 @@
+{
+    "require": {
+        "mschindler83/fints-hbci-php": "^1.0",
+        "splitbrain/php-cli": "^1.0",
+        "guzzlehttp/guzzle": "^6.3",
+        "electrolinux/phpquery": "^0.9.6",
+        "mustangostang/spyc": "^0.6.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "splitbrain\\TheBankster\\": "src"
+        }
+    }
+}
