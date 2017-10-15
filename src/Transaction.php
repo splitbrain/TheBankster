@@ -41,57 +41,43 @@ class Transaction
         ]));
     }
 
-    /**
-     * @return string
-     */
+    /** @return string */
     public function getTxid(): string
     {
         return $this->txid;
     }
 
-    /**
-     * @return \DateTime|string
-     */
+    /** @return \DateTime|string */
     public function getDatetime()
     {
         return $this->datetime;
     }
 
-    /**
-     * @return float
-     */
+    /** @return float */
     public function getAmount(): float
     {
         return $this->amount;
     }
 
-    /**
-     * @return string
-     */
+    /** @return string */
     public function getDescription(): string
     {
         return $this->description;
     }
 
-    /**
-     * @return string
-     */
+    /** @return string */
     public function getXName(): string
     {
         return $this->x_name;
     }
 
-    /**
-     * @return string
-     */
+    /** @return string */
     public function getXBank(): string
     {
         return $this->x_bank;
     }
 
-    /**
-     * @return string
-     */
+    /** @return string */
     public function getXAcct(): string
     {
         return $this->x_acct;
