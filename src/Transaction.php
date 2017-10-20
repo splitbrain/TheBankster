@@ -41,6 +41,38 @@ class Transaction
         ]));
     }
 
+    /**
+     * Show a useful identifier
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return
+            substr($this->txid, 0, 8) . "\t" .
+            $this->datetime->format('Y-m-d H:i') . "\t" .
+            $this->amount . "\t" .
+            substr(str_replace("\n", ' ', $this->description), 0, 25);
+    }
+
+    /**
+     * Return this transactions as PDO placeholder array
+     *
+     * @return array
+     */
+    public function getInsertionArray()
+    {
+        return [
+            ':txid' => $this->txid,
+            ':datetime' => $this->datetime->getTimestamp(),
+            ':amount' => $this->amount,
+            ':description' => $this->description,
+            ':x_name' => $this->x_name,
+            ':x_bank' => $this->x_bank,
+            ':x_acct' => $this->x_acct,
+        ];
+    }
+
     /** @return string */
     public function getTxid(): string
     {

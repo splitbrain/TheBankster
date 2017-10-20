@@ -9,9 +9,9 @@ class FinTS extends AbstractBackend
 
     protected $fints;
 
-    public function __construct($config)
+    public function __construct($config, $accountid)
     {
-        parent::__construct($config);
+        parent::__construct($config, $accountid);
 
         $port = parse_url($this->config['url'], PHP_URL_PORT);
         $port = $port ?: 443;
@@ -27,7 +27,7 @@ class FinTS extends AbstractBackend
 
 
     /** @inheritdoc */
-    public function getTransactions(\DateTime $since)
+    public function importTransactions(\DateTime $since)
     {
         $transactions = [];
 

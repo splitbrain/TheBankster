@@ -2,9 +2,10 @@
 
 namespace splitbrain\TheBankster\CLI;
 
+use splitbrain\phpcli\PSR3CLI;
 use splitbrain\TheBankster\Backend\AbstractBackend;
 
-class Statements extends \splitbrain\phpcli\CLI
+class Statements extends PSR3CLI
 {
 
     /**
@@ -35,18 +36,10 @@ class Statements extends \splitbrain\phpcli\CLI
 
             $class = '\\splitbrain\\TheBankster\\Backend\\'.$account['backend'];
             /** @var AbstractBackend $backend */
-            $backend = new $class($account['config']);
+            $backend = new $class($account['config'], $accid);
+            $backend->setLogger($this);
 
-            $transactions = $backend->getTransactions(new \DateTime('2017-10-01'));
-
-            foreach($transactions as $tx) {
-                echo "--------------\n";
-                echo "(".$tx->getXName().")\n";
-                echo $tx->getDescription();
-                echo "\n----\n";
-                echo $tx->getCleanDescription();
-                echo "\n";
-            }
+            $backend->importTransactions(new \DateTime('2017-01-01'));
         }
 
 

@@ -411,16 +411,16 @@
         },
         {
             "name": "splitbrain/php-cli",
-            "version": "1.0.1",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/splitbrain/php-cli.git",
-                "reference": "452f6dc70af9778d6fda8aca72164d34a939301d"
+                "reference": "7f73f3c17fa43e0139f801794ada7bfbbfac4d80"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/splitbrain/php-cli/zipball/452f6dc70af9778d6fda8aca72164d34a939301d",
-                "reference": "452f6dc70af9778d6fda8aca72164d34a939301d",
+                "url": "https://api.github.com/repos/splitbrain/php-cli/zipball/7f73f3c17fa43e0139f801794ada7bfbbfac4d80",
+                "reference": "7f73f3c17fa43e0139f801794ada7bfbbfac4d80",
                 "shasum": ""
             },
             "require": {
@@ -428,6 +428,9 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "4.5.*"
+            },
+            "suggest": {
+                "psr/log": "Allows you to make the CLI available as PSR-3 logger"
             },
             "type": "library",
             "autoload": {
@@ -455,7 +458,7 @@
                 "optparse",
                 "terminal"
             ],
-            "time": "2016-08-17T13:44:31+00:00"
+            "time": "2017-10-18T08:31:29+00:00"
         }
     ],
     "packages-dev": [],

@@ -68,9 +68,11 @@ class CurrencyConvert
 
         // convert
         if ($to == $this->main) {
-            return $amount / $this->rates[$from];
+            $result = $amount / $this->rates[$from];
         } else {
-            return $amount * $this->rates[$to];
+            $result = $amount * $this->rates[$to];
         }
+
+        return round($result, 2);
     }
 }

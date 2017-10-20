@@ -29,9 +29,9 @@ class Paypal extends AbstractBackend
     protected $convert;
 
     /** @inheritdoc */
-    public function __construct($config)
+    public function __construct($config, $accountid)
     {
-        parent::__construct($config);
+        parent::__construct($config, $accountid);
 
         $this->client = new Client([
             RequestOptions::ALLOW_REDIRECTS => [
@@ -47,9 +47,18 @@ class Paypal extends AbstractBackend
 
 
     /** @inheritdoc */
-    public function getTransactions(\DateTime $since)
+    public function importTransactions(\DateTime $since)
     {
-        return $this->call($since);
+        $transactions = $this->call($since);
+
+        $this->logger->notice('{count} new Paypal transactions available', ['count' => count($transactions)]);
+
+        foreach ($transactions as $transaction) {
+            $tx = $this->makeTransaction($transaction);
+            $this->storeTransaction($tx);
+        }
+
+        //$this->makeTransaction($trans);
     }
 
 
@@ -59,29 +68,38 @@ class Paypal extends AbstractBackend
      * @link https://developer.paypal.com/webapps/developer/docs/classic/api/merchant/TransactionSearch_API_Operation_NVP/
      *
      * @param \DateTime $since
+     * @param \DateTime|null $until
+     * @return array
      * @throws \Exception
      */
-    protected function call(\DateTime $since)
+    protected function call(\DateTime $since, \DateTime $until = null)
     {
+        $this->logger->debug('Calling Paypal TransactionSearch');
+        $options = [
+            'PWD' => $this->config['pass'],
+            'USER' => $this->config['user'],
+            'SIGNATURE' => $this->config['signature'],
+            'VERSION' => 94,
+            'METHOD' => 'TransactionSearch',
+            'STARTDATE' => $since->setTimezone(new \DateTimeZone('UTC'))->format('c'),
+        ];
+        if ($until) {
+            $options['ENDDATE'] = $until->setTimezone(new \DateTimeZone('UTC'))->format('c');
+        }
+
         $response = $this->client->post(
             'https://api-3t.paypal.com/nvp',
-            [
-                RequestOptions::FORM_PARAMS => [
-                    'PWD' => $this->config['pass'],
-                    'USER' => $this->config['user'],
-                    'SIGNATURE' => $this->config['signature'],
-                    'VERSION' => 94,
-                    'METHOD' => 'TransactionSearch',
-                    'STARTDATE' => $since->setTimezone(new \DateTimeZone('UTC'))->format('c'),
-                ]
-            ]
+            [RequestOptions::FORM_PARAMS => $options]
         );
 
-        $fields = [];
-        parse_str((string)$response->getBody(), $fields);
+        $fields = $this->http_parse_query((string)$response->getBody());
 
-        if ($fields['ACK'] != 'Success') {
-            throw new \Exception('Paypal returned wrong acknowledgement'); //FIXME handle more than 100 entries 
+        $rerun = false;
+        if ($fields['ACK'] == 'SuccessWithWarning') {
+            $rerun = true;
+        } else if ($fields['ACK'] != 'Success') {
+            print_r($fields);
+            throw new \Exception('Paypal returned wrong acknowledgement');
         }
 
         $data = [];
@@ -97,10 +115,22 @@ class Paypal extends AbstractBackend
                 }
             }
             if (!in_array($trans['L_STATUS'], ['Canceled', 'Denied'])) {
-                $data[] = $this->makeTransaction($trans);
+                $data[] = $trans;
             }
 
             $i++;
+        }
+
+        $this->logger->info('{count} Paypal transactions found', ['count' => count($data)]);
+
+        if ($rerun && isset($trans)) {
+            $until = new \DateTime($trans['L_TIMESTAMP']);
+            if ($since->diff($until)->format('%s') > 0) {
+                $this->logger->warning(
+                    'More Paypal transactions before {date} available. fetching...',
+                    ['date' => $until->format('Y-m-d')]);
+                $data = array_merge($data, $this->call($since, $until));
+            }
         }
 
         return ($data);
@@ -117,7 +147,7 @@ class Paypal extends AbstractBackend
     {
         // fetch additional info for tsome types
         if (!in_array($data['L_TYPE'], ['Transfer', 'Currency Conversion (debit)', 'Currency Conversion (credit)'])) {
-
+            $this->logger->debug('Calling Paypal GetTransactionDetails');
             $response = $this->client->post(
                 'https://api-3t.paypal.com/nvp',
                 [
@@ -151,8 +181,6 @@ class Paypal extends AbstractBackend
             $this->join($data, 'L_EMAIL')
         );
 
-        print_r($data);
-
         return $transaction;
     }
 
@@ -169,5 +197,78 @@ class Paypal extends AbstractBackend
         }
 
         return join("\n", $return);
+    }
+
+    /**
+     * Parses http query string into an array
+     *
+     * @author Alxcube <alxcube@gmail.com>
+     * @link http://php.net/manual/en/function.parse-str.php#119484
+     *
+     * @param string $queryString String to parse
+     * @param string $argSeparator Query arguments separator
+     * @param integer $decType Decoding type
+     * @return array
+     */
+    function http_parse_query($queryString, $argSeparator = '&', $decType = PHP_QUERY_RFC1738)
+    {
+        $result = array();
+        $parts = explode($argSeparator, $queryString);
+
+        foreach ($parts as $part) {
+            list($paramName, $paramValue) = explode('=', $part, 2);
+
+            switch ($decType) {
+                case PHP_QUERY_RFC3986:
+                    $paramName = rawurldecode($paramName);
+                    $paramValue = rawurldecode($paramValue);
+                    break;
+
+                case PHP_QUERY_RFC1738:
+                default:
+                    $paramName = urldecode($paramName);
+                    $paramValue = urldecode($paramValue);
+                    break;
+            }
+
+
+            if (preg_match_all('/\[([^\]]*)\]/m', $paramName, $matches)) {
+                $paramName = substr($paramName, 0, strpos($paramName, '['));
+                $keys = array_merge(array($paramName), $matches[1]);
+            } else {
+                $keys = array($paramName);
+            }
+
+            $target = &$result;
+
+            foreach ($keys as $index) {
+                if ($index === '') {
+                    if (isset($target)) {
+                        if (is_array($target)) {
+                            $intKeys = array_filter(array_keys($target), 'is_int');
+                            $index = count($intKeys) ? max($intKeys) + 1 : 0;
+                        } else {
+                            $target = array($target);
+                            $index = 1;
+                        }
+                    } else {
+                        $target = array();
+                        $index = 0;
+                    }
+                } elseif (isset($target[$index]) && !is_array($target[$index])) {
+                    $target[$index] = array($target[$index]);
+                }
+
+                $target = &$target[$index];
+            }
+
+            if (is_array($target)) {
+                $target[] = $paramValue;
+            } else {
+                $target = $paramValue;
+            }
+        }
+
+        return $result;
     }
 }

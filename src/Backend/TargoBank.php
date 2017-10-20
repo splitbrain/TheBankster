@@ -13,9 +13,9 @@ class TargoBank extends AbstractBackend
     protected $client;
 
     /** @inheritdoc */
-    public function __construct($config)
+    public function __construct($config, $accountid)
     {
-        parent::__construct($config);
+        parent::__construct($config, $accountid);
 
         $this->jar = new CookieJar();
 
@@ -38,7 +38,7 @@ class TargoBank extends AbstractBackend
     }
 
     /** @inheritdoc */
-    public function getTransactions(\DateTime $since)
+    public function importTransactions(\DateTime $since)
     {
 
         if (!$this->login($this->config['user'], $this->config['pass'])) {
