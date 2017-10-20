@@ -53,14 +53,12 @@ class TargoBank extends AbstractBackend
             throw new \Exception('Failed to parse account statements');
         }
 
-        $transactions = array();
-
         $trs = $table->find('tr');
         foreach ($trs as $tr) {
             $tds = pq($tr)->find('td');
             if ($tds->length !== 6) continue;
 
-            $transactions[] = new Transaction(
+            $tx = new Transaction(
                 $this->fixDate($tds->get(0)->textContent),
                 $this->fixAmount($tds->get(4)->textContent),
                 join("\n", [
@@ -70,10 +68,8 @@ class TargoBank extends AbstractBackend
                     $tds->get(5)->textContent, // foreign currency
                 ])
             );
+            $this->storeTransaction($tx);
         }
-
-        print_r($transactions);
-        return $transactions;
     }
 
     /**
@@ -112,6 +108,7 @@ class TargoBank extends AbstractBackend
             throw new \Exception('Failed to log in to TargoBank');
         }
 
+        $this->logger->debug('Reading TargoBank webinterface');
         $response = $this->client->get('https://www.targobank.de/de/banque/mouvements_icard.cgi');
         if ($response->getStatusCode() !== 200) {
             throw new \Exception('Got wrong status code from TargoBank');
@@ -129,6 +126,7 @@ class TargoBank extends AbstractBackend
      */
     protected function login($user, $pass)
     {
+        $this->logger->debug('Logging into TargoBank webinterface');
         $this->client->get('https://www.targobank.de/');
         $url = 'https://www.targobank.de/de/identification/login.cgi';
         $this->client->post(

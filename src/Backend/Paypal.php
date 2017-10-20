@@ -57,8 +57,6 @@ class Paypal extends AbstractBackend
             $tx = $this->makeTransaction($transaction);
             $this->storeTransaction($tx);
         }
-
-        //$this->makeTransaction($trans);
     }
 
 
@@ -66,7 +64,6 @@ class Paypal extends AbstractBackend
      * Fetch transactions from Paypal
      *
      * @link https://developer.paypal.com/webapps/developer/docs/classic/api/merchant/TransactionSearch_API_Operation_NVP/
-     *
      * @param \DateTime $since
      * @param \DateTime|null $until
      * @return array

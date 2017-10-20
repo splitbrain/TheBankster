@@ -26,4 +26,33 @@ class DataBase
     {
         return $this->pdo;
     }
+
+    /**
+     * @param string $sql
+     * @param array $parameters
+     * @return array
+     */
+    public function queryAll($sql, $parameters = [])
+    {
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($parameters);
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Query for exactly one single value
+     *
+     * @param string $sql
+     * @param array $parameters
+     * @return mixed
+     */
+    public function querySingleValue($sql, $parameters = [])
+    {
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($parameters);
+        $row = $stmt->fetch();
+
+        if (is_array($row) && count($row)) return array_values($row)[0];
+        return null;
+    }
 }

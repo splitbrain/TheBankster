@@ -32,6 +32,7 @@ class FinTS extends AbstractBackend
         $transactions = [];
 
         $accounts = $this->fints->getSEPAAccounts();
+        $this->logger->info('Found  {count} accounts.', ['count' => count($accounts)]);
         $account = $accounts[0];
         // use identifier when multiple acounts are available
         if (isset($this->config['ident'])) {
@@ -55,22 +56,21 @@ class FinTS extends AbstractBackend
                     $amount *= -1;
                 }
 
-                $transactions[] = new Transaction(
+                $transaction = new Transaction(
                     $tx->getBookingDate(),
                     $amount,
                     join("\n", [
-                            $tx->getDescription1(),
-                            $tx->getDescription2(),
-                            $tx->getBookingText()
-                        ]),
+                        $tx->getDescription1(),
+                        $tx->getDescription2(),
+                        $tx->getBookingText()
+                    ]),
                     $tx->getName(),
                     $tx->getBankCode(),
                     $tx->getAccountNumber()
                 );
+                $this->storeTransaction($transaction);
             }
         }
-
-        return $transactions;
     }
 
 
