@@ -40,11 +40,28 @@ class DataBase
     }
 
     /**
+     * Query one single row
+     *
+     * @param string $sql
+     * @param array $parameters
+     * @return array|null
+     */
+    public function queryRecord($sql, $parameters = [])
+    {
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($parameters);
+        $row = $stmt->fetch();
+
+        if (is_array($row) && count($row)) return $row;
+        return null;
+    }
+
+    /**
      * Query for exactly one single value
      *
      * @param string $sql
      * @param array $parameters
-     * @return mixed
+     * @return mixed|null
      */
     public function querySingleValue($sql, $parameters = [])
     {
