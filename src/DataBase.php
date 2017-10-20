@@ -55,4 +55,26 @@ class DataBase
         if (is_array($row) && count($row)) return array_values($row)[0];
         return null;
     }
+
+    /**
+     * Execute a statement
+     *
+     * Returns the last insert ID on INSERTs or the number of affected rows
+     *
+     * @param string $sql
+     * @param array $parameters
+     * @return int
+     */
+    public function exec($sql, $parameters = [])
+    {
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($parameters);
+
+        $count = $stmt->rowCount();
+        if ($count && preg_match('/^INSERT /i', $sql)) {
+            return $this->querySingleValue('SELECT last_insert_rowid()');
+        }
+
+        return $count;
+    }
 }
