@@ -3,5 +3,5 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$cli = new splitbrain\TheBankster\CLI\Rule();
+$cli = new splitbrain\TheBankster\CLI\RuleCLI();
 $cli->run();

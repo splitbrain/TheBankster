@@ -5,8 +5,9 @@ namespace splitbrain\TheBankster\CLI;
 use splitbrain\phpcli\Colors;
 use splitbrain\phpcli\Options;
 use splitbrain\phpcli\TableFormatter;
+use splitbrain\TheBankster\Model\Category;
 
-class Category extends \splitbrain\phpcli\PSR3CLI
+class CategoryCLI extends \splitbrain\phpcli\PSR3CLI
 {
 
     /**
@@ -48,7 +49,6 @@ class Category extends \splitbrain\phpcli\PSR3CLI
      */
     protected function main(Options $options)
     {
-        $cat = new \splitbrain\TheBankster\Category();
         $args = $options->getArgs();
 
         switch ($options->getCmd()) {
@@ -60,39 +60,41 @@ class Category extends \splitbrain\phpcli\PSR3CLI
                     [Colors::C_BROWN, Colors::C_BROWN, Colors::C_BROWN]
                 );
 
-                foreach ($cat->getAll() as $item) {
+                foreach (Category::loadAll() as $item) {
                     echo $tf->format(
                         ['10', '50', '*'],
-                        [$item['cat'], $item['top'], $item['label']]
+                        [$item['id'], $item['top'], $item['label']]
                     );
                 }
                 break;
 
             case 'add':
-                $id = $cat->add($args[0], $args[1]);
+                $cat = new Category([
+                    'top' => $args[0],
+                    'label' => $args[1]
+                ]);
+                $id = $cat->save();
                 $this->success('Category {id} added.', ['id' => $id]);
                 break;
 
             case 'change':
-                $ok = $cat->update($args[0], $args[1], $args[2]);
-                if ($ok) {
-                    $this->success('Category changed');
-                } else {
-                    $this->error('No such category');
-                }
+                $cat = Category::load($args[0]);
+                $cat->setData([
+                    'top' => $args[1],
+                    'label' => $args[2]
+                ]);
+                $cat->save();
+                $this->success('Category changed');
                 break;
 
             case 'del';
-                $ok = $cat->del($args[0]);
-                if ($ok) {
-                    $this->success('Category deleted');
-                } else {
-                    $this->error('No such category');
-                }
+                $cat = Category::load($args[0]);
+                $cat->delete();
+                $this->success('Category deleted');
                 break;
 
             case 'rename':
-                $ok = $cat->renameTop($args[0], $args[1]);
+                $ok = Category::renameTop($args[0], $args[1]);
                 if ($ok) {
                     $this->success('Top level renamed for {num} categories', ['num' => $ok]);
                 } else {

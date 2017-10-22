@@ -6,8 +6,9 @@ use splitbrain\phpcli\Colors;
 use splitbrain\phpcli\Options;
 use splitbrain\phpcli\PSR3CLI;
 use splitbrain\phpcli\TableFormatter;
+use splitbrain\TheBankster\Model\Rule;
 
-class Rule extends PSR3CLI
+class RuleCLI extends PSR3CLI
 {
 
     /**
@@ -33,12 +34,16 @@ class Rule extends PSR3CLI
 
         $options->registerCommand('change', 'Change an existing rule');
         $options->registerArgument('id', 'ID of the rule to change', true, 'change');
+        $options->registerOption('name', 'Change the name of the rule', null, 'name', 'change');
         $options->registerOption('account', 'Only apply this rule to this account', null, 'account', 'change');
         $options->registerOption('debit', 'Only match spending (-1) or income (+1)', null, '-1|+1', 'change');
         $options->registerOption('desc', 'Match this against the transaction\'s description', null, 'match', 'change');
         $options->registerOption('xname', 'Match this against the transaction issuer\'s name', null, 'match', 'change');
         $options->registerOption('xbank', 'Match this against the transaction issuer\'s bank', null, 'match', 'change');
         $options->registerOption('xaccount', 'Match this against the transaction issuer\'s account', null, 'match', 'change');
+
+        $options->registerCommand('del', 'Delete an existing rule');
+        $options->registerArgument('id', 'ID of the rule to change', true, 'del');
     }
 
     /**
@@ -56,7 +61,8 @@ class Rule extends PSR3CLI
 
         switch ($options->getCmd()) {
             case 'list':
-                $rules = \splitbrain\TheBankster\Rule::loadAllRules();
+                /** @var Rule[] $rules */
+                $rules = Rule::loadAll();
                 $tf = new TableFormatter($this->colors);
 
                 echo $tf->format(
@@ -69,9 +75,9 @@ class Rule extends PSR3CLI
                     echo $tf->format(
                         [5, 25, '*'],
                         [
-                            $rule->getId(),
-                            $rule->getName(),
-                            $rule->getDisplayMatches(),
+                            $rule['id'],
+                            $rule['name'],
+                            $rule->displayRules(),
                         ]
                     );
                 }
@@ -79,17 +85,25 @@ class Rule extends PSR3CLI
                 break;
 
             case 'add':
-                $rule = new \splitbrain\TheBankster\Rule($args[0]);
+                $rule = new Rule();
+                $rule['name'] = $args[0];
                 $this->applyOptions($rule, $options);
                 $id = $rule->save();
                 $this->success('Saved rule {id}', ['id' => $id]);
                 break;
 
             case 'change':
-                $rule = \splitbrain\TheBankster\Rule::loadFromDB($args[0]);
+                /** @var Rule $rule */
+                $rule = Rule::load($args[0]);
                 $this->applyOptions($rule, $options);
                 $rule->save();
                 $this->success('Updated rule');
+                break;
+
+            case 'del':
+                $rule = Rule::load($args[0]);
+                $rule->delete();
+                $this->success('Rule deleted');
                 break;
 
             default:
@@ -100,35 +114,39 @@ class Rule extends PSR3CLI
     /**
      * Apply the given options to the given rule
      *
-     * @param \splitbrain\TheBankster\Rule $rule
+     * @param Rule $rule
      * @param Options $options
      * @throws \Exception
      */
     protected function applyOptions($rule, $options)
     {
         $ok = false;
+        if ($options->getOpt('name') !== false) {
+            $rule['name'] = $options->getOpt('name');
+            $ok = true;
+        }
         if ($options->getOpt('account') !== false) {
-            $rule->matchAccount($options->getOpt('account'));
+            $rule['account'] = $options->getOpt('account');
             $ok = true;
         }
         if ($options->getOpt('debit') !== false) {
-            $rule->matchDebit($options->getOpt('debit'));
+            $rule['debit'] = $options->getOpt('debit');
             $ok = true;
         }
         if ($options->getOpt('desc') !== false) {
-            $rule->matchDescription($options->getOpt('desc'));
+            $rule['description'] = $options->getOpt('desc');
             $ok = true;
         }
         if ($options->getOpt('xname') !== false) {
-            $rule->matchXName($options->getOpt('xname'));
+            $rule['x_name'] = $options->getOpt('xname');
             $ok = true;
         }
         if ($options->getOpt('xbank') !== false) {
-            $rule->matchXBank($options->getOpt('xbank'));
+            $rule['x_bank'] = $options->getOpt('xbank');
             $ok = true;
         }
         if ($this->options->getOpt('xaccount') !== false) {
-            $rule->matchXAccount($this->options->getOpt('xaccount'));
+            $rule['x_acct'] = $this->options->getOpt('xaccount');
             $ok = true;
         }
 
