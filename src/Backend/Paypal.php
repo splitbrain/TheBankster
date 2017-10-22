@@ -111,7 +111,7 @@ class Paypal extends AbstractBackend
                     $trans[$f] = $fields[$f . $i];
                 }
             }
-            if (!in_array($trans['L_STATUS'], ['Canceled', 'Denied'])) {
+            if (!in_array($trans['L_STATUS'], ['Canceled', 'Denied', 'Removed', 'Pending'])) {
                 $data[] = $trans;
             }
 
@@ -161,7 +161,8 @@ class Paypal extends AbstractBackend
             $fields = [];
             parse_str((string)$response->getBody(), $fields);
             if ($fields['ACK'] != 'Success') {
-                echo('Paypal returned wrong acknowledgement');
+                $this->logger->error('Paypal returned wrong acknowledgement');
+                $this->logger->debug(print_r($data, true));
             } else {
                 $data = array_merge($data, $fields);
             }
