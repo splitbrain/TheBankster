@@ -63,7 +63,7 @@ class Transaction extends AbstractModel
 
     protected function validate()
     {
-        if($this->getDatetime()->getTimestamp() === 0) throw new \Exception('Zero Timestamp Transaction forbidden');
+        if ($this->getDatetime()->getTimestamp() === 0) throw new \Exception('Zero Timestamp Transaction forbidden');
     }
 
 
@@ -75,6 +75,7 @@ class Transaction extends AbstractModel
     public function __toString()
     {
         return
+            $this->fields['account'] . "\t" .
             substr($this->id, 0, 8) . "\t" .
             $this->getDatetime()->format('Y-m-d H:i') . "\t" .
             $this->fields['amount'] . "\t" .

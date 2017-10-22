@@ -43,10 +43,10 @@ abstract class AbstractBackend
         try {
             $tx['account'] = $this->accountid;
             $tx->save();
-            $this->logger->notice("Saved:\t" . $this->accountid . "\t" . (string)$tx);
+            $this->logger->notice("Saved:\t" . (string)$tx);
         } catch (\PDOException $e) {
             if ($e->getCode() == '23000') {
-                $this->logger->warning("Duplicate:\t" . $this->accountid . "\t" . (string)$tx);
+                $this->logger->warning("Duplicate:\t" . (string)$tx);
             } else {
                 throw $e;
             }

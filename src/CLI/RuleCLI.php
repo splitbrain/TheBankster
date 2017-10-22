@@ -44,6 +44,9 @@ class RuleCLI extends PSR3CLI
 
         $options->registerCommand('del', 'Delete an existing rule');
         $options->registerArgument('id', 'ID of the rule to change', true, 'del');
+
+        $options->registerCommand('preview', 'Show all matching transactions');
+        $options->registerArgument('id', 'ID of the rule to preview', true, 'preview');
     }
 
     /**
@@ -105,6 +108,14 @@ class RuleCLI extends PSR3CLI
                 $rule->delete();
                 $this->success('Rule deleted');
                 break;
+
+            case 'preview':
+                /** @var Rule $rule */
+                $rule = Rule::load($args[0]);
+                $txs = $rule->getTransactions();
+                foreach ($txs as $tx) echo (string)$tx. "\n";
+                break;
+
 
             default:
                 echo $options->help();

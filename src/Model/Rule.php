@@ -35,7 +35,7 @@ class Rule extends AbstractModel
     protected function validate()
     {
         parent::validate();
-        if(empty($this->fields['name'])) throw new \Exception('Name has to be set');
+        if (empty($this->fields['name'])) throw new \Exception('Name has to be set');
     }
 
 
@@ -60,5 +60,69 @@ class Rule extends AbstractModel
         }
 
         return join("\n", $matches);
+    }
+
+    /**
+     * Get the WHERE conditions to apply this rule
+     *
+     * @param \DateTime|null $from
+     * @param \DateTime|null $to
+     * @return array($sql,$vars)
+     */
+    public function getMatchCondition(\DateTime $from = null, \DateTime $to = null)
+    {
+        $where = [];
+        $vars = [];
+
+        // LIKE matching
+        foreach (['description', 'x_name', 'x_bank', 'x_acct'] as $key) {
+            if(!empty($this->fields[$key])) {
+                $match = $this->fields[$key];
+                $where[] = '"'.$key.'" LIKE :'.$key;
+                $vars[":$key"] = "%$match%";
+            }
+        }
+
+        if(!empty($this->fields['account'])) {
+            $where[] = '"account" = :account';
+            $vars[':account'] = $this->fields['account'];
+        }
+
+        if($this->fields['debit'] < 0) {
+            $where[] = '"amount" < 0';
+        } elseif($this->fields['debit'] > 0) {
+            $where[] = '"amount" > 0';
+        }
+
+        if($from !== null) {
+            $where[] = '"datetime" >= :from';
+            $vars[':from'] = $from->getTimestamp();
+        }
+
+        if($to !== null) {
+            $where[] = '"datetime" <= :to';
+            $vars[':to'] = $from->getTimestamp();
+        }
+
+        $sql = join("\nAND\n", $where);
+
+        return [$sql, $vars];
+    }
+
+    /**
+     * Get all transactions matching this rule
+     *
+     * @return Transaction[]
+     */
+    public function getTransactions() {
+        list($where, $vars) = $this->getMatchCondition();
+        $sql = 'SELECT * FROM "transaction" WHERE '.$where;
+        $list = $this->db->queryAll($sql, $vars);
+
+        $transactions = [];
+        if($list) foreach($list as $row) {
+            $transactions[] = new Transaction($row);
+        }
+        return $transactions;
     }
 }
