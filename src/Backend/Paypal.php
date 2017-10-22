@@ -111,7 +111,10 @@ class Paypal extends AbstractBackend
                     $trans[$f] = $fields[$f . $i];
                 }
             }
-            if (!in_array($trans['L_STATUS'], ['Canceled', 'Denied', 'Removed', 'Pending'])) {
+            if (
+                !in_array($trans['L_STATUS'], ['Canceled', 'Denied', 'Removed', 'Pending']) &&
+                !in_array($trans['L_TYPE'], ['Authorization', 'Order'])
+            ) {
                 $data[] = $trans;
             }
 
@@ -167,6 +170,7 @@ class Paypal extends AbstractBackend
                 $data = array_merge($data, $fields);
             }
         }
+        #$this->logger->debug(print_r($data));
 
         $data['BEFORE_FEES'] = "before fees: " . $data['L_AMT'] . ' ' . $data['L_CURRENCYCODE'];
 
