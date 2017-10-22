@@ -61,10 +61,10 @@ class Statements extends PSR3CLI
     {
         $db = new DataBase();
         $date = $db->querySingleValue(
-            'SELECT datetime
-               FROM transactions
-              WHERE account = :account
-           ORDER BY datetime DESC
+            'SELECT "datetime"
+               FROM "transaction"
+              WHERE "account" = :account
+           ORDER BY "datetime" DESC
               LIMIT 1',
             ['account' => $accid]
         );

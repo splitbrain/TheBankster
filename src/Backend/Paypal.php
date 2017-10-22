@@ -5,7 +5,7 @@ namespace splitbrain\TheBankster\Backend;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use splitbrain\TheBankster\CurrencyConvert;
-use splitbrain\TheBankster\Transaction;
+use splitbrain\TheBankster\Model\Transaction;
 
 /**
  * Class Paypal
@@ -49,7 +49,7 @@ class Paypal extends AbstractBackend
     /** @inheritdoc */
     public function importTransactions(\DateTime $since)
     {
-        $transactions = $this->call($since);
+        $transactions = $this->findTransactions($since);
 
         $this->logger->notice('{count} new Paypal transactions available', ['count' => count($transactions)]);
 
@@ -69,7 +69,7 @@ class Paypal extends AbstractBackend
      * @return array
      * @throws \Exception
      */
-    protected function call(\DateTime $since, \DateTime $until = null)
+    protected function findTransactions(\DateTime $since, \DateTime $until = null)
     {
         $this->logger->debug('Calling Paypal TransactionSearch');
         $options = [
@@ -126,7 +126,7 @@ class Paypal extends AbstractBackend
                 $this->logger->warning(
                     'More Paypal transactions before {date} available. fetching...',
                     ['date' => $until->format('Y-m-d')]);
-                $data = array_merge($data, $this->call($since, $until));
+                $data = array_merge($data, $this->findTransactions($since, $until));
             }
         }
 
@@ -169,16 +169,14 @@ class Paypal extends AbstractBackend
 
         $data['BEFORE_FEES'] = "before fees: " . $data['L_AMT'] . ' ' . $data['L_CURRENCYCODE'];
 
-        $transaction = new Transaction(
-            new \DateTime($data['L_TIMESTAMP']),
-            $this->convert->convert($data['L_NETAMT'], $data['L_CURRENCYCODE']),
-            $this->join($data, 'SUBJECT', 'L_NAME0', 'L_TYPE', 'L_TRANSACTIONID', 'BEFORE_FEES'),
-            $this->join($data, 'L_NAME'),
-            '',
-            $this->join($data, 'L_EMAIL')
-        );
-
-        return $transaction;
+        $tx = new Transaction();
+        $tx['datetime'] = $data['L_TIMESTAMP'];
+        $tx['amount'] = $this->convert->convert($data['L_NETAMT'], $data['L_CURRENCYCODE']);
+        $tx['description'] = $this->join($data, 'SUBJECT', 'L_NAME0', 'L_TYPE', 'L_TRANSACTIONID', 'BEFORE_FEES');
+        $tx['x_name'] = $this->join($data, 'L_NAME');
+        $tx['x_bank'] = 'Paypal';
+        $tx['x_acct'] = $this->join($data, 'L_EMAIL');
+        return $tx;
     }
 
     /**

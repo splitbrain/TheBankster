@@ -95,7 +95,7 @@ abstract class AbstractModel implements \ArrayAccess
 
     /**
      * Override to validate before saving
-     * 
+     *
      * @throws \Exception
      */
     protected function validate()
@@ -159,27 +159,45 @@ abstract class AbstractModel implements \ArrayAccess
     /**
      * Insert as new record
      *
-     * @return int
+     * @return mixed the new ID
      */
     protected function insert()
     {
         $table = self::getTableName();
         $placeholders = $this->getPlaceholders();
-        $fields = join(', ',
-            array_map(
-                function ($in) {
-                    return '"' . $in . '"';
-                },
-                array_keys($this->fields)
-            )
-        );
+        $fieldnames = array_keys($this->fields);
+
+        // support self generated IDs
+        $id = $this->generateID();
+        if ($id !== null) {
+            $fieldnames[] = 'id';
+            $placeholders[':id'] = $id;
+        }
+
+        // prepare
+        $fieldnames = join(', ', array_map(
+            function ($in) {
+                return '"' . $in . '"';
+            },
+            $fieldnames
+        ));
         $pl = join(', ', array_keys($placeholders));
 
-        $sql = "INSERT INTO $table ($fields) VALUES ($pl)";
+        $sql = "INSERT INTO $table ($fieldnames) VALUES ($pl)";
 
-        $id = $this->db->exec($sql, $placeholders);
-        $this->id = $id;
+        $newid = $this->db->exec($sql, $placeholders);
+        if (!$id) $this->id = $newid;
         return $id;
+    }
+
+    /**
+     * Implement if IDs are generated outside the database
+     *
+     * @return mixed
+     */
+    protected function generateID()
+    {
+        return null;
     }
 
     /**
@@ -212,7 +230,7 @@ abstract class AbstractModel implements \ArrayAccess
     /** @inheritdoc */
     public function offsetSet($name, $value)
     {
-        $setter = ucfirst("get_$name");
+        $setter = self::snakeToCamel("set_$name");
         if (is_callable([$this, $setter])) {
             return $this->$setter($value);
         }
@@ -242,7 +260,7 @@ abstract class AbstractModel implements \ArrayAccess
     /** @inheritdoc */
     public function offsetGet($name)
     {
-        $getter = ucfirst("get_$name");
+        $getter = self::snakeToCamel("get_$name");
         if (is_callable([$this, $getter])) {
             return $this->$getter();
         }

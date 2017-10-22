@@ -5,7 +5,7 @@ namespace splitbrain\TheBankster\Backend;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use splitbrain\TheBankster\DataBase;
-use splitbrain\TheBankster\Transaction;
+use splitbrain\TheBankster\Model\Transaction;
 
 abstract class AbstractBackend
 {
@@ -35,27 +35,24 @@ abstract class AbstractBackend
      * Backends that can not select by time should return as many statements as possible
      *
      * @param \DateTime $since
-     * @return Transaction[]
      */
     abstract public function importTransactions(\DateTime $since);
 
     protected function storeTransaction(Transaction $tx)
     {
         try {
-            $stmt = $this->db->getPDO()->prepare(
-                "INSERT OR IGNORE INTO transactions
-                             (txid, account, datetime, amount, description, x_name, x_bank, x_acct)
-                      VALUES (:txid, :account, :datetime, :amount, :description, :x_name, :x_bank, :x_acct)
-                ");
-            $data = $tx->getInsertionArray();
-            $data[':account'] = $this->accountid;
-            $stmt->execute($data);
-
-            $this->logger->notice('Saved: ' . (string)$tx);
+            $tx['account'] = $this->accountid;
+            $tx->save();
+            $this->logger->notice("Saved:\t" . $this->accountid . "\t" . (string)$tx);
+        } catch (\PDOException $e) {
+            if ($e->getCode() == '23000') {
+                $this->logger->warning("Duplicate:\t" . $this->accountid . "\t" . (string)$tx);
+            } else {
+                throw $e;
+            }
         } catch (\Exception $e) {
             $this->logger->error('Transaction was not saved: {message}', ['message' => $e->getMessage()]);
             $this->logger->debug($e->getTraceAsString());
         }
-        // FIXME print success
     }
 }

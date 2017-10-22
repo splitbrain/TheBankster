@@ -5,7 +5,7 @@ namespace splitbrain\TheBankster\Backend;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\RequestOptions;
-use splitbrain\TheBankster\Transaction;
+use splitbrain\TheBankster\Model\Transaction;
 
 class TargoBank extends AbstractBackend
 {
@@ -58,16 +58,15 @@ class TargoBank extends AbstractBackend
             $tds = pq($tr)->find('td');
             if ($tds->length !== 6) continue;
 
-            $tx = new Transaction(
-                $this->fixDate($tds->get(0)->textContent),
-                $this->fixAmount($tds->get(4)->textContent),
-                join("\n", [
-                    $tds->get(1)->textContent, // details
-                    $tds->get(2)->textContent, // city
-                    $tds->get(3)->textContent, // country
-                    $tds->get(5)->textContent, // foreign currency
-                ])
-            );
+            $tx = new Transaction();
+            $tx['datetime'] = $this->fixDate($tds->get(0)->textContent);
+            $tx['amount'] = $this->fixAmount($tds->get(4)->textContent);
+            $tx['description'] = join("\n", [
+                $tds->get(1)->textContent, // details
+                $tds->get(2)->textContent, // city
+                $tds->get(3)->textContent, // country
+                $tds->get(5)->textContent, // foreign currency
+            ]);
             $this->storeTransaction($tx);
         }
     }

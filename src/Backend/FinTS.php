@@ -2,7 +2,7 @@
 
 namespace splitbrain\TheBankster\Backend;
 
-use splitbrain\TheBankster\Transaction;
+use splitbrain\TheBankster\Model\Transaction;
 
 class FinTS extends AbstractBackend
 {
@@ -29,8 +29,6 @@ class FinTS extends AbstractBackend
     /** @inheritdoc */
     public function importTransactions(\DateTime $since)
     {
-        $transactions = [];
-
         $accounts = $this->fints->getSEPAAccounts();
         $this->logger->info('Found  {count} accounts.', ['count' => count($accounts)]);
         $account = $accounts[0];
@@ -50,25 +48,24 @@ class FinTS extends AbstractBackend
         // get all the transactions
         $soa = $this->fints->getStatementOfAccount($account, $since, new \DateTime());
         foreach ($soa->getStatements() as $statement) {
-            foreach ($statement->getTransactions() as $tx) {
-                $amount = $tx->getAmount();
-                if ($tx->getCreditDebit() == \Fhp\Model\StatementOfAccount\Transaction::CD_DEBIT) {
+            foreach ($statement->getTransactions() as $fintrans) {
+                $amount = $fintrans->getAmount();
+                if ($fintrans->getCreditDebit() == \Fhp\Model\StatementOfAccount\Transaction::CD_DEBIT) {
                     $amount *= -1;
                 }
 
-                $transaction = new Transaction(
-                    $tx->getBookingDate(),
-                    $amount,
-                    join("\n", [
-                        $tx->getDescription1(),
-                        $tx->getDescription2(),
-                        $tx->getBookingText()
-                    ]),
-                    $tx->getName(),
-                    $tx->getBankCode(),
-                    $tx->getAccountNumber()
-                );
-                $this->storeTransaction($transaction);
+                $tx = new Transaction();
+                $tx['datetime'] = $fintrans->getBookingDate();
+                $tx['amount'] = $amount;
+                $tx['description'] = join("\n", [
+                    $fintrans->getDescription1(),
+                    $fintrans->getDescription2(),
+                    $fintrans->getBookingText()
+                ]);
+                $tx['x_name'] = $fintrans->getName();
+                $tx['x_bank'] = $fintrans->getBankCode();
+                $tx['x_acct'] = $fintrans->getAccountNumber();
+                $this->storeTransaction($tx);
             }
         }
     }
