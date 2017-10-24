@@ -25,6 +25,7 @@ class RuleCLI extends PSR3CLI
 
         $options->registerCommand('add', 'Add a new rule');
         $options->registerArgument('name', 'Name for the new rule', true, 'add');
+        $options->registerArgument('cat', 'The category ID this rules applies to', 'id', 'add');
         $options->registerOption('account', 'Only apply this rule to this account', null, 'account', 'add');
         $options->registerOption('debit', 'Only match spending (-1) or income (+1)', null, '-1|+1', 'add');
         $options->registerOption('desc', 'Match this against the transaction\'s description', null, 'match', 'add');
@@ -35,6 +36,7 @@ class RuleCLI extends PSR3CLI
         $options->registerCommand('change', 'Change an existing rule');
         $options->registerArgument('id', 'ID of the rule to change', true, 'change');
         $options->registerOption('name', 'Change the name of the rule', null, 'name', 'change');
+        $options->registerOption('cat', 'Change the category of the rule', null, 'id', 'change');
         $options->registerOption('account', 'Only apply this rule to this account', null, 'account', 'change');
         $options->registerOption('debit', 'Only match spending (-1) or income (+1)', null, '-1|+1', 'change');
         $options->registerOption('desc', 'Match this against the transaction\'s description', null, 'match', 'change');
@@ -69,16 +71,17 @@ class RuleCLI extends PSR3CLI
                 $tf = new TableFormatter($this->colors);
 
                 echo $tf->format(
-                    [5, 25, '*'],
-                    ['ID', 'Name', 'Matches'],
-                    [Colors::C_BROWN, Colors::C_BROWN, Colors::C_BROWN]
+                    [5, 5, 25, '*'],
+                    ['ID', 'Cat', 'Name', 'Matches'],
+                    [Colors::C_BROWN, Colors::C_BROWN, Colors::C_BROWN, Colors::C_BROWN]
                 );
 
                 foreach ($rules as $rule) {
                     echo $tf->format(
-                        [5, 25, '*'],
+                        [5, 5, 25, '*'],
                         [
                             $rule['id'],
+                            $rule['category_id'],
                             $rule['name'],
                             $rule->displayRules(),
                         ]
@@ -90,6 +93,7 @@ class RuleCLI extends PSR3CLI
             case 'add':
                 $rule = new Rule();
                 $rule['name'] = $args[0];
+                $rule['category_id'] = (int) $args[1];
                 $this->applyOptions($rule, $options);
                 $id = $rule->save();
                 $this->success('Saved rule {id}', ['id' => $id]);
@@ -132,6 +136,10 @@ class RuleCLI extends PSR3CLI
     protected function applyOptions($rule, $options)
     {
         $ok = false;
+        if ($options->getOpt('cat') !== false) {
+            $rule['category_id'] = $options->getOpt('cat');
+            $ok = true;
+        }
         if ($options->getOpt('name') !== false) {
             $rule['name'] = $options->getOpt('name');
             $ok = true;
