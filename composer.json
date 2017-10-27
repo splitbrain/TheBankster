@@ -6,7 +6,8 @@
         "electrolinux/phpquery": "^0.9.6",
         "mustangostang/spyc": "^0.6.2",
         "tflori/orm": "^1.2",
-        "slim/slim": "^3.0"
+        "slim/slim": "^3.0",
+        "slim/twig-view": "^2.3"
     },
     "autoload": {
         "psr-4": {

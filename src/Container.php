@@ -5,7 +5,7 @@ namespace splitbrain\TheBankster;
 use ORM\DbConfig;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-
+use Slim\Views\Twig;
 
 /**
  * Class Container
@@ -28,7 +28,7 @@ class Container extends \Slim\Container
     public static function getInstance()
     {
         if (self::$instance === null) {
-            $configuration = []; // FIXME
+            $configuration = \Spyc::YAMLLoad(__DIR__ . '/../config.yaml');
             self::$instance = new Container($configuration);
         }
         return self::$instance;
@@ -39,11 +39,11 @@ class Container extends \Slim\Container
      *
      * You should not call this, but use getInstance() instead
      *
-     * @param array $values
+     * @param array $config
      */
-    public function __construct(array $values = [])
+    public function __construct(array $config = [])
     {
-        parent::__construct($values);
+        parent::__construct($config);
 
         // default logger
         $this->logger = new NullLogger();
@@ -60,6 +60,25 @@ class Container extends \Slim\Container
             $em->getConnection()->exec('PRAGMA foreign_keys = ON');
             return $em;
         };
+
+        // create the Twig view
+        $this['view'] = function () {
+            $view = new Twig(__DIR__ . '/../views', [
+                'cache' => false,
+                'debug' => true,
+            ]);
+
+            //set view variables
+            //$view->offsetSet('navigation', $this->navigation);
+
+            $view->addExtension(new \Slim\Views\TwigExtension(
+                $this->router,
+                $this->request->getUri()
+            ));
+            return $view;
+        };
+
+
     }
 
     /**

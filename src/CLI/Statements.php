@@ -38,7 +38,7 @@ class Statements extends PSR3CLI
         $db = $container->db;
 
         // FIXME we load this data from the database later
-        $config = \Spyc::YAMLLoad(__DIR__ . '/../../config.yaml');
+        $config = $container->settings;
 
         foreach ($config['accounts'] as $accid => $account) {
             $class = '\\splitbrain\\TheBankster\\Backend\\' . $account['backend'];

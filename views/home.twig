@@ -1,0 +1,20 @@
+{% extends 'app.twig' %}
+
+{% block content %}
+
+    Hello World
+
+    <table>
+        {% for tx in transactions %}
+            <tr>
+                <td>{{ tx.account }}</td>
+                <td>{{ tx.datetime.format('Y-m-d') }}</td>
+                <td>{{ tx.amount }}</td>
+                <td>{{ tx.cleanDescription|nl2br }}</td>
+                <td>{{ tx.xName }}</td>
+                <td>{{ tx.xBank }} {{ tx.xAccount }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}
