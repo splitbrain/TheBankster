@@ -655,16 +655,16 @@
         },
         {
             "name": "splitbrain/php-cli",
-            "version": "1.1.0",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/splitbrain/php-cli.git",
-                "reference": "7f73f3c17fa43e0139f801794ada7bfbbfac4d80"
+                "reference": "4795af10ff1c3b1ac614ef380d7d810af495e6f1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/splitbrain/php-cli/zipball/7f73f3c17fa43e0139f801794ada7bfbbfac4d80",
-                "reference": "7f73f3c17fa43e0139f801794ada7bfbbfac4d80",
+                "url": "https://api.github.com/repos/splitbrain/php-cli/zipball/4795af10ff1c3b1ac614ef380d7d810af495e6f1",
+                "reference": "4795af10ff1c3b1ac614ef380d7d810af495e6f1",
                 "shasum": ""
             },
             "require": {
@@ -702,7 +702,7 @@
                 "optparse",
                 "terminal"
             ],
-            "time": "2017-10-18T08:31:29+00:00"
+            "time": "2017-10-27T16:18:07+00:00"
         },
         {
             "name": "tflori/orm",
