@@ -3,10 +3,13 @@
 namespace splitbrain\TheBankster\CLI;
 
 use splitbrain\phpcli\Colors;
+use splitbrain\phpcli\Exception;
 use splitbrain\phpcli\Options;
 use splitbrain\phpcli\PSR3CLI;
 use splitbrain\phpcli\TableFormatter;
-use splitbrain\TheBankster\Model\Rule;
+use splitbrain\TheBankster\Container;
+use splitbrain\TheBankster\Entity\Rule;
+use splitbrain\TheBankster\Entity\Transaction;
 
 class RuleCLI extends PSR3CLI
 {
@@ -49,6 +52,7 @@ class RuleCLI extends PSR3CLI
 
         $options->registerCommand('preview', 'Show all matching transactions');
         $options->registerArgument('id', 'ID of the rule to preview', true, 'preview');
+
     }
 
     /**
@@ -58,31 +62,35 @@ class RuleCLI extends PSR3CLI
      *
      * @param Options $options
      * @return void
+     * @throws Exception
      */
     protected function main(Options $options)
     {
+        $container = Container::getInstance();
+        $container->setLogger($this);
+        $db = $container->db;
 
         $args = $options->getArgs();
-
         switch ($options->getCmd()) {
             case 'list':
                 /** @var Rule[] $rules */
-                $rules = Rule::loadAll();
+                $rules = $db->fetch(Rule::class)->all();
                 $tf = new TableFormatter($this->colors);
 
                 echo $tf->format(
-                    [5, 5, 25, '*'],
-                    ['ID', 'Cat', 'Name', 'Matches'],
-                    [Colors::C_BROWN, Colors::C_BROWN, Colors::C_BROWN, Colors::C_BROWN]
+                    [5, 5, 25, 25, '*'],
+                    ['ID', 'CatID', 'Category', 'Name', 'Matches'],
+                    [Colors::C_BROWN, Colors::C_BROWN, Colors::C_BROWN, Colors::C_BROWN, Colors::C_BROWN]
                 );
 
                 foreach ($rules as $rule) {
                     echo $tf->format(
-                        [5, 5, 25, '*'],
+                        [5, 5, 25, 25, '*'],
                         [
-                            $rule['id'],
-                            $rule['category_id'],
-                            $rule['name'],
+                            $rule->id,
+                            $rule->category->id,
+                            $rule->category->getFullName(),
+                            $rule->name,
                             $rule->displayRules(),
                         ]
                     );
@@ -92,8 +100,8 @@ class RuleCLI extends PSR3CLI
 
             case 'add':
                 $rule = new Rule();
-                $rule['name'] = $args[0];
-                $rule['category_id'] = (int) $args[1];
+                $rule->name = $args[0];
+                $rule->category_id = (int)$args[1]; // FIXME
                 $this->applyOptions($rule, $options);
                 $id = $rule->save();
                 $this->success('Saved rule {id}', ['id' => $id]);
@@ -101,23 +109,26 @@ class RuleCLI extends PSR3CLI
 
             case 'change':
                 /** @var Rule $rule */
-                $rule = Rule::load($args[0]);
+                $rule = $db->fetch(Rule::class, $args[0]);
+                if ($rule === null) throw new Exception('No such rule', -1);
                 $this->applyOptions($rule, $options);
                 $rule->save();
                 $this->success('Updated rule');
                 break;
 
             case 'del':
-                $rule = Rule::load($args[0]);
-                $rule->delete();
+                $rule = $db->fetch(Rule::class, $args[0]);
+                if ($rule === null) throw new Exception('No such rule', -1);
+                $db->delete($rule);
                 $this->success('Rule deleted');
                 break;
 
             case 'preview':
-                /** @var Rule $rule */
-                $rule = Rule::load($args[0]);
-                $txs = $rule->getTransactions();
-                foreach ($txs as $tx) echo (string)$tx. "\n";
+                /*
+                 $rule = Rule::load($args[0]);
+                 $txs = $rule->getTransactions();
+                 foreach ($txs as $tx) echo (string)$tx . "\n";
+                */
                 break;
 
 
@@ -137,35 +148,35 @@ class RuleCLI extends PSR3CLI
     {
         $ok = false;
         if ($options->getOpt('cat') !== false) {
-            $rule['category_id'] = $options->getOpt('cat');
+            $rule->categoryId = $options->getOpt('cat');
             $ok = true;
         }
         if ($options->getOpt('name') !== false) {
-            $rule['name'] = $options->getOpt('name');
+            $rule->name = $options->getOpt('name');
             $ok = true;
         }
         if ($options->getOpt('account') !== false) {
-            $rule['account'] = $options->getOpt('account');
+            $rule->account = $options->getOpt('account');
             $ok = true;
         }
         if ($options->getOpt('debit') !== false) {
-            $rule['debit'] = $options->getOpt('debit');
+            $rule->debit = $options->getOpt('debit');
             $ok = true;
         }
         if ($options->getOpt('desc') !== false) {
-            $rule['description'] = $options->getOpt('desc');
+            $rule->description = $options->getOpt('desc');
             $ok = true;
         }
         if ($options->getOpt('xname') !== false) {
-            $rule['x_name'] = $options->getOpt('xname');
+            $rule->xName = $options->getOpt('xname');
             $ok = true;
         }
         if ($options->getOpt('xbank') !== false) {
-            $rule['x_bank'] = $options->getOpt('xbank');
+            $rule->xBank = $options->getOpt('xbank');
             $ok = true;
         }
         if ($this->options->getOpt('xaccount') !== false) {
-            $rule['x_acct'] = $this->options->getOpt('xaccount');
+            $rule->xAcct = $this->options->getOpt('xaccount');
             $ok = true;
         }
 

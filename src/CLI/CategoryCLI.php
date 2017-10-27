@@ -3,11 +3,15 @@
 namespace splitbrain\TheBankster\CLI;
 
 use splitbrain\phpcli\Colors;
+use splitbrain\phpcli\Exception;
 use splitbrain\phpcli\Options;
+use splitbrain\phpcli\PSR3CLI;
 use splitbrain\phpcli\TableFormatter;
-use splitbrain\TheBankster\Model\Category;
+use splitbrain\TheBankster\Container;
+use splitbrain\TheBankster\Entity\Category;
 
-class CategoryCLI extends \splitbrain\phpcli\PSR3CLI
+
+class CategoryCLI extends PSR3CLI
 {
 
     /**
@@ -49,8 +53,11 @@ class CategoryCLI extends \splitbrain\phpcli\PSR3CLI
      */
     protected function main(Options $options)
     {
-        $args = $options->getArgs();
+        $container = Container::getInstance();
+        $container->setLogger($this);
+        $db = $container->db;
 
+        $args = $options->getArgs();
         switch ($options->getCmd()) {
             case 'list':
                 $tf = new TableFormatter($this->colors);
@@ -60,10 +67,11 @@ class CategoryCLI extends \splitbrain\phpcli\PSR3CLI
                     [Colors::C_BROWN, Colors::C_BROWN, Colors::C_BROWN]
                 );
 
-                foreach (Category::loadAll() as $item) {
+                $items = $db->fetch(Category::class)->all();
+                foreach ($items as $item) {
                     echo $tf->format(
                         ['10', '50', '*'],
-                        [$item['id'], $item['top'], $item['label']]
+                        [$item->id, $item->top, $item->label]
                     );
                 }
                 break;
@@ -73,13 +81,14 @@ class CategoryCLI extends \splitbrain\phpcli\PSR3CLI
                     'top' => $args[0],
                     'label' => $args[1]
                 ]);
-                $id = $cat->save();
-                $this->success('Category {id} added.', ['id' => $id]);
+                $new = $cat->save();
+                $this->success('Category {id} added.', ['id' => $new->id]);
                 break;
 
             case 'change':
-                $cat = Category::load($args[0]);
-                $cat->setData([
+                $cat = $db->fetch(Category::class, $args[0]);
+                if ($cat === null) throw new Exception('No such category', -1);
+                $cat->fill([
                     'top' => $args[1],
                     'label' => $args[2]
                 ]);
@@ -88,8 +97,9 @@ class CategoryCLI extends \splitbrain\phpcli\PSR3CLI
                 break;
 
             case 'del';
-                $cat = Category::load($args[0]);
-                $cat->delete();
+                $cat = $db->fetch(Category::class, $args[0]);
+                if ($cat === null) throw new Exception('No such category', -1);
+                $db->delete($cat);
                 $this->success('Category deleted');
                 break;
 

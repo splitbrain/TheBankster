@@ -5,9 +5,9 @@ CREATE TABLE "category" (
 );
 
 CREATE TABLE "transaction" (
-  "id" TEXT NOT NULL PRIMARY KEY,
+  "id" INTEGER NOT NULL PRIMARY KEY,
   "account" TEXT NOT NULL,
-  "datetime" INTEGER NOT NULL,
+  "ts" INTEGER NOT NULL,
   "amount" REAL NOT NULL,
   "description" TEXT NOT NULL DEFAULT '',
   "x_name" TEXT NOT NULL DEFAULT '',
@@ -15,6 +15,7 @@ CREATE TABLE "transaction" (
   "x_acct" TEXT NOT NULL DEFAULT '',
   "category_id" INTEGER NULL,
 
+  UNIQUE ("ts", "description", "amount", "x_bank", "x_name", "x_acct"),
   FOREIGN KEY ("category_id") REFERENCES "category"("id")
 );
 

@@ -2,7 +2,7 @@
 
 namespace splitbrain\TheBankster\Backend;
 
-use splitbrain\TheBankster\Model\Transaction;
+use splitbrain\TheBankster\Entity\Transaction;
 
 class FinTS extends AbstractBackend
 {
@@ -55,16 +55,16 @@ class FinTS extends AbstractBackend
                 }
 
                 $tx = new Transaction();
-                $tx['datetime'] = $fintrans->getBookingDate();
-                $tx['amount'] = $amount;
-                $tx['description'] = join("\n", [
+                $tx->datetime = $fintrans->getBookingDate();
+                $tx->amount = $amount;
+                $tx->description = join("\n", [
                     $fintrans->getDescription1(),
                     $fintrans->getDescription2(),
                     $fintrans->getBookingText()
                 ]);
-                $tx['x_name'] = $fintrans->getName();
-                $tx['x_bank'] = $fintrans->getBankCode();
-                $tx['x_acct'] = $fintrans->getAccountNumber();
+                $tx->xName = $fintrans->getName();
+                $tx->xBank = $fintrans->getBankCode();
+                $tx->xAcct = $fintrans->getAccountNumber();
                 $this->storeTransaction($tx);
             }
         }

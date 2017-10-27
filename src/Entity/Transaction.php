@@ -1,71 +1,42 @@
 <?php
 
-namespace splitbrain\TheBankster\Model;
+namespace splitbrain\TheBankster\Entity;
 
-class Transaction extends AbstractModel
+class Transaction extends \ORM\Entity
 {
-    protected $fields = [
-        'account' => '',
-        'datetime' => 0,
-        'amount' => 0.0,
-        'description' => '',
-        'x_name' => '',
-        'x_bank' => '',
-        'x_acct' => '',
-        'category_id' => null,
+    protected static $relations = [
+        'category' => [Category::class, ['categoryId' => 'id']],
     ];
 
+
     /**
-     * Custom setter for the datetime field
+     * Custom setter for the ts field
      *
      * @param int|string|\DateTime $dt
      */
     public function setDatetime($dt)
     {
         if (is_int($dt)) {
-            $this->fields['datetime'] = $dt;
+            $this->ts = $dt;
         } else {
             if (!is_a($dt, \DateTime::class)) {
                 $dt = new \DateTime($dt);
             }
-            $this->fields['datetime'] = $dt->getTimestamp();
+            $this->ts = $dt->getTimestamp();
         }
     }
 
     /**
-     * Custom getter for datetime
+     * Custom getter for ts
      *
      * @return \DateTime
      */
     public function getDatetime()
     {
         $dt = new \DateTime();
-        $dt->setTimestamp($this->fields['datetime']);
+        $dt->setTimestamp($this->ts);
         return $dt;
     }
-
-    /**
-     * IDs are created from data, this avoids double importing
-     *
-     * @return string
-     */
-    protected function generateID()
-    {
-        return md5(join('-', [
-            $this->fields['datetime'],
-            $this->fields['description'],
-            $this->fields['amount'],
-            $this->fields['x_bank'],
-            $this->fields['x_name'],
-            $this->fields['x_acct']
-        ]));
-    }
-
-    protected function validate()
-    {
-        if ($this->getDatetime()->getTimestamp() === 0) throw new \Exception('Zero Timestamp Transaction forbidden');
-    }
-
 
     /**
      * Show a useful identifier
@@ -75,11 +46,11 @@ class Transaction extends AbstractModel
     public function __toString()
     {
         return
-            $this->fields['account'] . "\t" .
-            substr($this->id, 0, 8) . "\t" .
-            $this->getDatetime()->format('Y-m-d H:i') . "\t" .
-            $this->fields['amount'] . "\t" .
-            substr(str_replace("\n", ' ', $this->fields['description']), 0, 25);
+            $this->account . "\t" .
+            $this->id . "\t" .
+            $this->datetime->format('Y-m-d H:i') . "\t" .
+            $this->amount . "\t" .
+            substr(str_replace("\n", ' ', $this->description), 0, 25);
     }
 
     /**
@@ -89,7 +60,7 @@ class Transaction extends AbstractModel
      */
     public function getCleanDescription()
     {
-        $lines = explode("\n", $this->fields['description']);
+        $lines = explode("\n", $this->description);
 
         // try to get the EREF bullshit to the end
         $parts = explode('+', $lines[0]);

@@ -38,11 +38,11 @@ abstract class AbstractBackend
      */
     abstract public function importTransactions(\DateTime $since);
 
-    protected function storeTransaction(Transaction $tx)
+    protected function storeTransaction(\splitbrain\TheBankster\Entity\Transaction $tx)
     {
         try {
-            $tx['account'] = $this->accountid;
-            $tx->save();
+            $tx->account = $this->accountid;
+            $tx = $tx->save();
             $this->logger->notice("Saved:\t" . (string)$tx);
         } catch (\PDOException $e) {
             if ($e->getCode() == '23000') {

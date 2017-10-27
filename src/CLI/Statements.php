@@ -2,9 +2,12 @@
 
 namespace splitbrain\TheBankster\CLI;
 
+use ORM\EntityManager;
+use ORM\QueryBuilder\QueryBuilder;
 use splitbrain\phpcli\PSR3CLI;
 use splitbrain\TheBankster\Backend\AbstractBackend;
-use splitbrain\TheBankster\DataBase;
+use splitbrain\TheBankster\Container;
+use splitbrain\TheBankster\Entity\Transaction;
 
 class Statements extends PSR3CLI
 {
@@ -30,6 +33,10 @@ class Statements extends PSR3CLI
      */
     protected function main(\splitbrain\phpcli\Options $options)
     {
+        $container = Container::getInstance();
+        $container->setLogger($this);
+        $db = $container->db;
+
         // FIXME we load this data from the database later
         $config = \Spyc::YAMLLoad(__DIR__ . '/../../config.yaml');
 
@@ -39,7 +46,7 @@ class Statements extends PSR3CLI
             $backend = new $class($account['config'], $accid);
             $backend->setLogger($this);
 
-            $last = $this->getLastUpdate($accid);
+            $last = $this->getLastUpdate($db, $accid);
             $this->notice(
                 'Importing {account} from {date}',
                 [
@@ -54,30 +61,24 @@ class Statements extends PSR3CLI
     /**
      * When was the last update of the given account?
      *
+     * @param EntityManager $db
      * @param $accid
      * @return \DateTime
      */
-    protected function getLastUpdate($accid)
+    protected function getLastUpdate(EntityManager $db, $accid)
     {
-        $db = new DataBase();
-        $date = $db->querySingleValue(
-            'SELECT "datetime"
-               FROM "transaction"
-              WHERE "account" = :account
-           ORDER BY "datetime" DESC
-              LIMIT 1',
-            ['account' => $accid]
-        );
+        /** @var Transaction $last */
+        $last = $db->fetch(Transaction::class)
+            ->where('account', '=', $accid)
+            ->orderBy('ts', QueryBuilder::DIRECTION_DESCENDING)
+            ->one();
+        if ($last !== null) return $last->getDatetime();
 
+        // import from start of current year
         $dt = new \DateTime();
-        if ($date !== null) {
-            $dt = $dt->setTimestamp($date);
-        } else {
-            // import from start of current year
-            $year = $dt->format('Y');
-            $dt->setDate($year, 1, 1);
-            $dt->setTime(0, 0, 1);
-        }
+        $year = $dt->format('Y');
+        $dt->setDate($year, 1, 1);
+        $dt->setTime(0, 0, 1);
 
         return $dt;
     }

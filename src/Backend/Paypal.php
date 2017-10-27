@@ -5,7 +5,7 @@ namespace splitbrain\TheBankster\Backend;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use splitbrain\TheBankster\CurrencyConvert;
-use splitbrain\TheBankster\Model\Transaction;
+use splitbrain\TheBankster\Entity\Transaction;
 
 /**
  * Class Paypal
@@ -175,12 +175,12 @@ class Paypal extends AbstractBackend
         $data['BEFORE_FEES'] = "before fees: " . $data['L_AMT'] . ' ' . $data['L_CURRENCYCODE'];
 
         $tx = new Transaction();
-        $tx['datetime'] = $data['L_TIMESTAMP'];
-        $tx['amount'] = $this->convert->convert($data['L_NETAMT'], $data['L_CURRENCYCODE']);
-        $tx['description'] = $this->join($data, 'SUBJECT', 'L_NAME0', 'L_TYPE', 'L_TRANSACTIONID', 'BEFORE_FEES');
-        $tx['x_name'] = $this->join($data, 'L_NAME');
-        $tx['x_bank'] = 'Paypal';
-        $tx['x_acct'] = $this->join($data, 'L_EMAIL');
+        $tx->datetime = $data['L_TIMESTAMP'];
+        $tx->amount = $this->convert->convert($data['L_NETAMT'], $data['L_CURRENCYCODE']);
+        $tx->description = $this->join($data, 'SUBJECT', 'L_NAME0', 'L_TYPE', 'L_TRANSACTIONID', 'BEFORE_FEES');
+        $tx->xName = $this->join($data, 'L_NAME');
+        $tx->xBank = 'Paypal';
+        $tx->xAcct = $this->join($data, 'L_EMAIL');
         return $tx;
     }
 
