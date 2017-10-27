@@ -50,7 +50,7 @@ class Transaction extends \ORM\Entity
             $this->id . "\t" .
             $this->datetime->format('Y-m-d H:i') . "\t" .
             $this->amount . "\t" .
-            substr(str_replace("\n", ' ', $this->description), 0, 25);
+            substr(str_replace("\n", ' ', $this->getCleanDescription()), 0, 50);
     }
 
     /**

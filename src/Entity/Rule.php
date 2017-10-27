@@ -36,7 +36,7 @@ class Rule extends Entity
     {
         $matches = [];
 
-        foreach (['account', 'debit', 'description', 'x_name', 'x_bank', 'x_acct'] as $key) {
+        foreach (['account', 'debit', 'description', 'xName', 'xBank', 'xAcct'] as $key) {
             if ($this->$key) {
                 $val = $this->$key;
                 if ($key == 'debit') {
@@ -48,5 +48,30 @@ class Rule extends Entity
         }
 
         return join("\n", $matches);
+    }
+
+    /**
+     * @return \ORM\EntityFetcher
+     */
+    public function matchTransactionsQuery()
+    {
+        $query = $this->entityManager->fetch(Transaction::class);
+
+        if ($this->account) {
+            $query->andWhere('account', '=', $this->account);
+        }
+
+        if ($this->debit) {
+            $op = ($this->debit < 0) ? '<=' : '>=';
+            $query->andWhere('amount', $op, 0);
+        }
+
+        foreach (['description', 'xName', 'xBank', 'xAcct'] as $key) {
+            if ($this->$key) {
+                $query->andWhere($key, 'LIKE', '%' . $this->$key . '%');
+            }
+        }
+
+        return $query;
     }
 }

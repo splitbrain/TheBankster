@@ -9,7 +9,6 @@ use splitbrain\phpcli\PSR3CLI;
 use splitbrain\phpcli\TableFormatter;
 use splitbrain\TheBankster\Container;
 use splitbrain\TheBankster\Entity\Rule;
-use splitbrain\TheBankster\Entity\Transaction;
 
 class RuleCLI extends PSR3CLI
 {
@@ -53,6 +52,8 @@ class RuleCLI extends PSR3CLI
         $options->registerCommand('preview', 'Show all matching transactions');
         $options->registerArgument('id', 'ID of the rule to preview', true, 'preview');
 
+        $options->registerCommand('enable', 'Enable a rule and apply it to all matching transactions');
+        $options->registerArgument('id', 'ID of the rule to enable', true, 'enable');
     }
 
     /**
@@ -78,16 +79,19 @@ class RuleCLI extends PSR3CLI
                 $tf = new TableFormatter($this->colors);
 
                 echo $tf->format(
-                    [5, 5, 25, 25, '*'],
-                    ['ID', 'CatID', 'Category', 'Name', 'Matches'],
-                    [Colors::C_BROWN, Colors::C_BROWN, Colors::C_BROWN, Colors::C_BROWN, Colors::C_BROWN]
+                    [3, 3, 5, 25, 25, '*'],
+                    ['ID', 'On', 'CatID', 'Category', 'Name', 'Matches'],
+                    [Colors::C_BROWN, Colors::C_BROWN, Colors::C_BROWN, Colors::C_BROWN, Colors::C_BROWN, Colors::C_BROWN]
                 );
 
                 foreach ($rules as $rule) {
                     echo $tf->format(
-                        [5, 5, 25, 25, '*'],
+                        [3, 3, 5, 25, 25, '*'],
                         [
                             $rule->id,
+                            $rule->enabled
+                                ? $this->colors->wrap('✓', Colors::C_GREEN)
+                                : $this->colors->wrap('✘', Colors::C_RED),
                             $rule->category->id,
                             $rule->category->getFullName(),
                             $rule->name,
@@ -124,16 +128,38 @@ class RuleCLI extends PSR3CLI
                 break;
 
             case 'preview':
-                /*
-                 $rule = Rule::load($args[0]);
-                 $txs = $rule->getTransactions();
-                 foreach ($txs as $tx) echo (string)$tx . "\n";
-                */
+                /** @var Rule $rule */
+                $rule = $db->fetch(Rule::class, $args[0]);
+                if ($rule === null) throw new Exception('No such rule', -1);
+
+                $query = $rule->matchTransactionsQuery();
+                $txs = $query->all();
+                foreach ($txs as $tx) echo (string)$tx . "\n";
                 break;
 
+            case 'enable';
+                /** @var Rule $rule */
+                $rule = $db->fetch(Rule::class, $args[0]);
+                if ($rule === null) throw new Exception('No such rule', -1);
+
+                $rule->enabled = 1;
+                $rule->save();
+
+                $query = $rule->matchTransactionsQuery();
+                $txs = $query->all();
+                foreach ($txs as $tx) {
+                    $tx->categoryId = $rule->category_id;
+                    $tx->save();
+                    echo '.';
+                }
+                echo "\n";
+                $this->success('Rule enabled');
+                break;
 
             default:
                 echo $options->help();
+
+
         }
     }
 
