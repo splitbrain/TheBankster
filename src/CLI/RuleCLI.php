@@ -26,7 +26,6 @@ class RuleCLI extends PSR3CLI
         $options->registerCommand('list', 'List all available rules');
 
         $options->registerCommand('add', 'Add a new rule');
-        $options->registerArgument('name', 'Name for the new rule', true, 'add');
         $options->registerArgument('cat', 'The category ID this rules applies to', 'id', 'add');
         $options->registerOption('account', 'Only apply this rule to this account', null, 'account', 'add');
         $options->registerOption('debit', 'Only match spending (-1) or income (+1)', null, '-1|+1', 'add');
@@ -37,7 +36,6 @@ class RuleCLI extends PSR3CLI
 
         $options->registerCommand('change', 'Change an existing rule');
         $options->registerArgument('id', 'ID of the rule to change', true, 'change');
-        $options->registerOption('name', 'Change the name of the rule', null, 'name', 'change');
         $options->registerOption('cat', 'Change the category of the rule', null, 'id', 'change');
         $options->registerOption('account', 'Only apply this rule to this account', null, 'account', 'change');
         $options->registerOption('debit', 'Only match spending (-1) or income (+1)', null, '-1|+1', 'change');
@@ -79,14 +77,14 @@ class RuleCLI extends PSR3CLI
                 $tf = new TableFormatter($this->colors);
 
                 echo $tf->format(
-                    [3, 3, 5, 25, 25, '*'],
-                    ['ID', 'On', 'CatID', 'Category', 'Name', 'Matches'],
-                    [Colors::C_BROWN, Colors::C_BROWN, Colors::C_BROWN, Colors::C_BROWN, Colors::C_BROWN, Colors::C_BROWN]
+                    [3, 3, 5, 25, '*'],
+                    ['ID', 'On', 'CatID', 'Category', 'Matches'],
+                    [Colors::C_BROWN, Colors::C_BROWN, Colors::C_BROWN, Colors::C_BROWN, Colors::C_BROWN]
                 );
 
                 foreach ($rules as $rule) {
                     echo $tf->format(
-                        [3, 3, 5, 25, 25, '*'],
+                        [3, 3, 5, 25, '*'],
                         [
                             $rule->id,
                             $rule->enabled
@@ -94,7 +92,6 @@ class RuleCLI extends PSR3CLI
                                 : $this->colors->wrap('✘', Colors::C_RED),
                             $rule->category->id,
                             $rule->category->getFullName(),
-                            $rule->name,
                             $rule->displayRules(),
                         ]
                     );
@@ -104,7 +101,6 @@ class RuleCLI extends PSR3CLI
 
             case 'add':
                 $rule = new Rule();
-                $rule->name = $args[0];
                 $rule->category_id = (int)$args[1]; // FIXME
                 $this->applyOptions($rule, $options);
                 $rule = $rule->save();
@@ -175,10 +171,6 @@ class RuleCLI extends PSR3CLI
         $ok = false;
         if ($options->getOpt('cat') !== false) {
             $rule->categoryId = $options->getOpt('cat');
-            $ok = true;
-        }
-        if ($options->getOpt('name') !== false) {
-            $rule->name = $options->getOpt('name');
             $ok = true;
         }
         if ($options->getOpt('account') !== false) {

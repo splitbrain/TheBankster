@@ -21,11 +21,10 @@ CREATE TABLE "transaction" (
   FOREIGN KEY ("category_id") REFERENCES "category" ("id")
 );
 
-CREATE TABLE "rule" (
+CREATE TABLE "ruleX" (
   "id"          INTEGER NOT NULL PRIMARY KEY,
   "enabled"     BOOLEAN NOT NULL DEFAULT 0,
   "category_id" INTEGER NOT NULL,
-  "name"        TEXT    NOT NULL DEFAULT '',
   "account"     TEXT    NOT NULL DEFAULT '',
   "debit"       INTEGER NOT NULL DEFAULT 0,
   "description" TEXT    NOT NULL DEFAULT '',
@@ -33,6 +32,5 @@ CREATE TABLE "rule" (
   "x_bank"      TEXT    NOT NULL DEFAULT '',
   "x_acct"      TEXT    NOT NULL DEFAULT '',
 
-  UNIQUE ("name"),
   FOREIGN KEY ("category_id") REFERENCES "category" ("id")
 );
