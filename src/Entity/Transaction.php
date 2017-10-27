@@ -89,4 +89,9 @@ class Transaction extends \ORM\Entity
 
         return join("\n", $lines);
     }
+
+    public function __isset($value)
+    {
+        return true;
+    }
 }

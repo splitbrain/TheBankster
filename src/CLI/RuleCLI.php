@@ -107,8 +107,8 @@ class RuleCLI extends PSR3CLI
                 $rule->name = $args[0];
                 $rule->category_id = (int)$args[1]; // FIXME
                 $this->applyOptions($rule, $options);
-                $id = $rule->save();
-                $this->success('Saved rule {id}', ['id' => $id]);
+                $rule = $rule->save();
+                $this->success('Saved rule {id}', ['id' => $rule->id]);
                 break;
 
             case 'change':
