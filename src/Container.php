@@ -10,7 +10,8 @@ use Slim\Views\Twig;
 /**
  * Class Container
  *
- * @property \ORM\EntityManager db
+ * @property EntityManager db
+ * @property Twig view
  */
 class Container extends \Slim\Container
 {
@@ -58,6 +59,7 @@ class Container extends \Slim\Container
                 )
             ]);
             $em->getConnection()->exec('PRAGMA foreign_keys = ON');
+            $em->getConnection()->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
             return $em;
         };
 

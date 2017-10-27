@@ -68,6 +68,28 @@ class SqlHelper
     }
 
     /**
+     * Query for a list of values
+     *
+     * the first column in the result is returned as a list
+     *
+     * @param string $sql
+     * @param array $parameters
+     * @return array
+     */
+    public function queryList($sql, $parameters = [])
+    {
+        $list = [];
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($parameters);
+
+        while ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
+            $list[] = $row[0];
+        }
+        return $list;
+    }
+
+    /**
      * Execute a statement
      *
      * Returns the last insert ID on INSERTs or the number of affected rows

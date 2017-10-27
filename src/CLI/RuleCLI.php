@@ -38,7 +38,7 @@ class RuleCLI extends PSR3CLI
         $options->registerArgument('id', 'ID of the rule to change', true, 'change');
         $options->registerOption('cat', 'Change the category of the rule', null, 'id', 'change');
         $options->registerOption('account', 'Only apply this rule to this account', null, 'account', 'change');
-        $options->registerOption('debit', 'Only match spending (-1) or income (+1)', null, '-1|+1', 'change');
+        $options->registerOption('debit', 'Only match spending (neg) or income (pos)', null, 'neg|pos', 'change');
         $options->registerOption('desc', 'Match this against the transaction\'s description', null, 'match', 'change');
         $options->registerOption('xname', 'Match this against the transaction issuer\'s name', null, 'match', 'change');
         $options->registerOption('xbank', 'Match this against the transaction issuer\'s bank', null, 'match', 'change');
@@ -101,7 +101,7 @@ class RuleCLI extends PSR3CLI
 
             case 'add':
                 $rule = new Rule();
-                $rule->category_id = (int)$args[1]; // FIXME
+                $rule->category_id = (int)$args[0];
                 $this->applyOptions($rule, $options);
                 $rule = $rule->save();
                 $this->success('Saved rule {id}', ['id' => $rule->id]);
@@ -178,7 +178,14 @@ class RuleCLI extends PSR3CLI
             $ok = true;
         }
         if ($options->getOpt('debit') !== false) {
-            $rule->debit = $options->getOpt('debit');
+            $deb = $options->getOpt('debit');
+            if($deb === 'neg') {
+                $rule->debit = -1;
+            } elseif ($deb === 'pos') {
+                $rule->debit = 1;
+            } else {
+                throw new Exception('Debit option requires neg or pos as agrument');
+            }
             $ok = true;
         }
         if ($options->getOpt('desc') !== false) {

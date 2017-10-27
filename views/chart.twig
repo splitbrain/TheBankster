@@ -1,0 +1,38 @@
+{% extends 'app.twig' %}
+
+{% block content %}
+
+    <div id="chart_div" style="width: 80%; height:400px"></div>
+
+
+
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script>
+        google.charts.load('current', {
+            'packages': ['table', 'corechart', 'bar']
+        });
+        google.charts.setOnLoadCallback(drawBasic);
+
+        function drawBasic() {
+            var data = google.visualization.arrayToDataTable({{ data|raw }});
+
+            var options = {
+                chartArea: {
+                    width: '50%'
+                },
+                isStacked: true,
+                backgroundColor: {fill: 'transparent'},
+                bars: 'horizontal',
+                seriesType: 'bars',
+                series: {0: {type: 'line'}}
+            };
+
+            var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
+            chart.draw(data, options);
+        }
+    </script>
+{% endblock script %}
