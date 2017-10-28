@@ -18,7 +18,7 @@
             <td>{{ tx.account }}</td>
             <td>{{ tx.datetime.format('Y-m-d') }}</td>
             <td class="has-text-right {% if tx.amount < 0 %}has-text-danger{% else %}has-text-success{% endif %}">{{ "%.2f"|format(tx.amount) }}</td>
-            <td>{{ tx.cleanDescription|nl2br }}</td>
+            <td class="tx-description">{{ tx.cleanDescription|nl2br }}</td>
             <td>{{ tx.xName }}</td>
             <td>{{ [tx.xBank, tx.xAcct] | join("\n") |nl2br }}</td>
             <td>

@@ -91,3 +91,21 @@ document.addEventListener('DOMContentLoaded', function () {
     })
 
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    var elements = Array.prototype.slice.call(document.getElementsByClassName('tx-description'), 0);
+    elements.forEach(function (el) {
+        var matches = el.innerText.match(/^(\d{3}\.\d{7}\.\d{7}) A[Mm]/);
+        if(matches) {
+            var a = document.createElement('a');
+            a.href='https://www.amazon.de/gp/your-account/order-details/ref=oh_aui_or_o00_?ie=UTF8&orderID='+matches[1].replace(/\./g,'-');
+            a.innerText='🔍 ';
+            a.target='_blank';
+            a.title='Open on Amazon.de';
+
+            el.insertBefore(a, el.firstChild);
+
+            console.log(matches);
+        }
+    });
+});

@@ -67,7 +67,7 @@ class ChartController extends BaseController
             $zoom = true;
         }
 
-        $transactions = $txQuery->all($limit);
+        $transactions = $txQuery->orderBy('ts', 'DESC')->all($limit);
         $chartData = $this->buildChartArray($data, $cols);
 
         return $this->view->render($response, 'chart.twig',
