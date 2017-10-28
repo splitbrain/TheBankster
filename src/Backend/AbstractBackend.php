@@ -4,8 +4,6 @@ namespace splitbrain\TheBankster\Backend;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use splitbrain\TheBankster\DataBase;
-use splitbrain\TheBankster\Model\Transaction;
 
 abstract class AbstractBackend
 {
@@ -20,7 +18,6 @@ abstract class AbstractBackend
     {
         $this->config = $config;
         $this->accountid = $accountid;
-        $this->db = new DataBase();
         $this->logger = new NullLogger();
     }
 
