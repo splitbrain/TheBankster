@@ -2,6 +2,7 @@
 
 namespace splitbrain\TheBankster\Controller;
 
+use Slim\Exception\NotFoundException;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
@@ -12,11 +13,12 @@ class ChartController extends BaseController
     {
 
         if (isset($args['top'])) {
-            $data = $this->getSubTopicSums($args['top']);
             $cols = $this->getSubTopicNames($args['top']);
+            if(!count($cols)) throw new NotFoundException($request, $response);
+            $data = $this->getSubTopicSums($args['top']);
         } else {
-            $data = $this->getTopTopicSums();
             $cols = $this->getTopTopicNames();
+            $data = $this->getTopTopicSums();
         }
 
         $rows = $this->buildArray($data, $cols);
@@ -24,7 +26,8 @@ class ChartController extends BaseController
         $this->view->render($response, 'chart.twig',
             [
                 'title' => isset($args['top']) ? 'Category ' . $args['top'] : 'Categories',
-                'data' => json_encode($rows, JSON_PRETTY_PRINT)
+                'data' => json_encode($rows, JSON_PRETTY_PRINT),
+                'istop' => (int) isset($args['top']),
             ]
         );
     }

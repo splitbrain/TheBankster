@@ -23,6 +23,7 @@
 
         function drawBasic() {
             var data = google.visualization.arrayToDataTable({{ data|raw }});
+            var istop = {{ istop }};
 
             var options = {
                 chartArea: {
@@ -37,6 +38,13 @@
 
             var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
             chart.draw(data, options);
+
+            if (!istop) {
+                google.visualization.events.addListener(chart, 'select', function selectHandler(e) {
+                    var col = chart.getSelection()[0].column;
+                    window.location.href += encodeURIComponent(data.getColumnLabel(col));
+                });
+            }
         }
     </script>
 {% endblock script %}
