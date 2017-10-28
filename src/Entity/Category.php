@@ -32,6 +32,21 @@ class Category extends Entity
         return $db->exec($sql, [':new' => $new, ':old' => $old]);
     }
 
+    /**
+     * Get all categories for the use in forms
+     *
+     * @return array
+     */
+    static public function formList() {
+        $data = [];
+        $cats = Container::getInstance()->db->fetch(Category::class)->orderBy('top')->orderBy('label')->all();
+        foreach ($cats as $cat) {
+            if (!isset($data[$cat->top])) $data[$cat->top] = [];
+            $data[$cat->top][$cat->id] = $cat->label;
+        }
+        return $data;
+    }
+
     public function __isset($value)
     {
         return true;

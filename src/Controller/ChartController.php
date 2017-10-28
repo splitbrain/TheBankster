@@ -107,7 +107,7 @@ class ChartController extends BaseController
      */
     protected function getTopTopicSums()
     {
-        $sql = 'SELECT strftime(\'%Y-%m\', ts, \'unixepoch\') AS dt,
+        $sql = 'SELECT strftime(\'%Y-%m\', ts, \'unixepoch\', \'localtime\') AS dt,
                        IFNULL(C.top,\'Uncategorized\') AS cat,
                        SUM(amount) AS val
                   FROM "transaction" AS T
@@ -125,7 +125,7 @@ class ChartController extends BaseController
      */
     protected function getSubTopicSums($top)
     {
-        $sql = 'SELECT strftime(\'%Y-%m\', ts, \'unixepoch\') AS dt,
+        $sql = 'SELECT strftime(\'%Y-%m\', ts, \'unixepoch\', \'localtime\') AS dt,
                        C.label AS cat,
                        SUM(amount) AS val
                   FROM "transaction" AS T,

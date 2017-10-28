@@ -4,6 +4,7 @@ namespace splitbrain\TheBankster\Controller;
 
 use Slim\Http\Request;
 use Slim\Http\Response;
+use splitbrain\TheBankster\Entity\Category;
 use splitbrain\TheBankster\Entity\Transaction;
 
 class HomeController extends BaseController
@@ -23,7 +24,8 @@ class HomeController extends BaseController
         $this->view->render($response, 'home.twig',
             [
                 'title' => 'Home',
-                'transactions'=>$txs
+                'transactions'=>$txs,
+                'categories' => Category::formList(),
             ]
         );
     }

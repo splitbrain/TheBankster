@@ -1,0 +1,32 @@
+{% import 'macro/form.twig' as form %}
+
+<div class="modal" id="assign-category-modal">
+    <div class="modal-background"></div>
+    <div class="modal-content">
+        <div class="box">
+            <form id="assign-category-form">
+                <input type="hidden" name="txid" value="">
+
+
+                {% for group,sub in categories %}
+
+
+                    <div class="field is-grouped is-grouped-multiline">
+                        <h3 class="has-text-primary control">{{ group }}</h3>
+                        {% for key,val in sub %}
+                            <label class="control">
+                                <input type="radio" class="radio" name="categoryId" value="{{ key }}">
+                                {{ val }}
+                            </label>
+                        {% endfor %}
+                    </div>
+
+                {% endfor %}
+
+                <button class="button is-primary" type="submit">Assign</button>
+            </form>
+        </div>
+    </div>
+    <button class="modal-close is-large" aria-label="close"></button>
+</div>
+

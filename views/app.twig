@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link type="text/css" rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.0/css/bulma.min.css">
-    
+
 </head>
 <body>
 
@@ -18,9 +18,15 @@
     {% endblock %}
 </main>
 
+<script>BASE_URL = '{{ base_url() }}';</script>
+{% if categories %}
+    {% include 'partial/assignmodal.twig' %}
+{% endif %}
+
 {% block script %}
 {% endblock script %}
 <script src="{{ base_url() }}/script.js"></script>
+
 
 </body>
 </html>

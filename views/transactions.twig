@@ -1,0 +1,9 @@
+{% extends 'app.twig' %}
+
+{% block content %}
+    <section class="section">
+        <h1 class="title">{{ title }}</h1>
+
+        {% include 'partial/transactions.twig' %}
+    </section>
+{% endblock %}

@@ -8,6 +8,7 @@
         <th>Issuer Name</th>
         <th>Issuer Bank<br/>Issuer Account</th>
         <th>Category</th>
+        <th></th>
     </tr>
     </thead>
 
@@ -21,9 +22,20 @@
             <td>{{ tx.xName }}</td>
             <td>{{ [tx.xBank, tx.xAcct] | join("\n") |nl2br }}</td>
             <td>
-                <a href="{{ path_for('chart', {'top': tx.category.top}) }}">{{ tx.category.top }}</a><br />
-                {{ tx.category.label }}
+                {% if tx.category.label %}
+                    <a href="{{ path_for('chart', {'top': tx.category.top}) }}">{{ tx.category.top }}</a><br/>
+                    {{ tx.category.label }}
+                {% else %}
+                    <a href="{{ path_for('rule') }}?{{ {
+                        'account': tx.account,
+                        'description': tx.cleanDescription|replace({"\n": ' '}),
+                        'xName': tx.xName,
+                        'xBank': tx.xBank,
+                        'xAcct': tx.xAcct
+                    } |url_encode }}" title="create rule">+</a>
+                {% endif %}
             </td>
+            <td><a class="assign-category" data-txid="{{ tx.id }}" href="#" title="change category">↻</a></td>
         </tr>
     {% endfor %}
     </tbody>

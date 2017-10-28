@@ -27,6 +27,11 @@ class RuleController extends BaseController
             if ($rule === null) throw new NotFoundException($request, $response);
         } else {
             $rule = new Rule();
+            try {
+                $this->applyPostData($rule, $request->getQueryParams());
+            } catch (\Exception $ignored){
+                // we're only prefilling here
+            }
         }
 
         if ($request->isPost()) {
@@ -48,7 +53,7 @@ class RuleController extends BaseController
         return $this->view->render($response, 'rule.twig', [
             'title' => ($rule->id) ? 'Edit Rule ' . $rule->id : 'Add a Rule',
             'accounts' => $this->getAccounts(),
-            'categories' => $this->getCategories(),
+            'categories' => Category::formList(),
             'rule' => $rule,
             'error' => $error,
             'transactions' => $transactions,
@@ -166,19 +171,4 @@ class RuleController extends BaseController
         return $accounts;
     }
 
-    /**
-     * Get a nested list of available categories
-     *
-     * @return array
-     */
-    protected function getCategories()
-    {
-        $data = [];
-        $cats = $this->container->db->fetch(Category::class)->orderBy('top')->orderBy('label')->all();
-        foreach ($cats as $cat) {
-            if (!isset($data[$cat->top])) $data[$cat->top] = [];
-            $data[$cat->top][$cat->id] = $cat->label;
-        }
-        return $data;
-    }
 }
