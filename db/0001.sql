@@ -18,10 +18,10 @@ CREATE TABLE "transaction" (
   "category_id" INTEGER NULL,
 
   UNIQUE ("ts", "description", "amount", "x_bank", "x_name", "x_acct"),
-  FOREIGN KEY ("category_id") REFERENCES "category" ("id")
+  FOREIGN KEY ("category_id") REFERENCES "category" ("id") ON DELETE SET NULL 
 );
 
-CREATE TABLE "ruleX" (
+CREATE TABLE "rule" (
   "id"          INTEGER NOT NULL PRIMARY KEY,
   "enabled"     BOOLEAN NOT NULL DEFAULT 0,
   "category_id" INTEGER NOT NULL,
@@ -32,5 +32,5 @@ CREATE TABLE "ruleX" (
   "x_bank"      TEXT    NOT NULL DEFAULT '',
   "x_acct"      TEXT    NOT NULL DEFAULT '',
 
-  FOREIGN KEY ("category_id") REFERENCES "category" ("id")
+  FOREIGN KEY ("category_id") REFERENCES "category" ("id") ON DELETE CASCADE
 );

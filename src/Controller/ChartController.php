@@ -14,7 +14,7 @@ class ChartController extends BaseController
 
         if (isset($args['top'])) {
             $cols = $this->getSubTopicNames($args['top']);
-            if(!count($cols)) throw new NotFoundException($request, $response);
+            if (!count($cols)) throw new NotFoundException($request, $response);
             $data = $this->getSubTopicSums($args['top']);
         } else {
             $cols = $this->getTopTopicNames();
@@ -27,7 +27,7 @@ class ChartController extends BaseController
             [
                 'title' => isset($args['top']) ? 'Category ' . $args['top'] : 'Categories',
                 'data' => json_encode($rows, JSON_PRETTY_PRINT),
-                'istop' => (int) isset($args['top']),
+                'istop' => (int)isset($args['top']),
             ]
         );
     }

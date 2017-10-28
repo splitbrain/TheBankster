@@ -1,14 +1,21 @@
 <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
         <a class="navbar-item" href="{{ base_url() }}">TheBankster</a>
+
+        <button class="button navbar-burger is-dark" data-target="navMenu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
     </div>
-    <div class="navbar-menu">
+    <div class="navbar-menu" id="navMenu">
         <div class="navbar-start">
             <a href="{{ path_for('chart') }}" class="navbar-item">Charts</a>
         </div>
 
         <div class="navbar-end">
-            <a href="{{ path_for('rule') }}" class="navbar-item">Add Rule</a>
+            <a href="{{ path_for('categories') }}" class="navbar-item">Categories</a>
+            <a href="{{ path_for('rules') }}" class="navbar-item">Rules</a>
         </div>
     </div>
 </nav>

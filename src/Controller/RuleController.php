@@ -39,8 +39,8 @@ class RuleController extends BaseController
             }
         }
 
-        if($rule->id) {
-            $transactions = $rule->matchTransactionsQuery()->orderBy('ts','DESC')->all();
+        if ($rule->id) {
+            $transactions = $rule->matchTransactionsQuery()->orderBy('ts', 'DESC')->all();
         } else {
             $transactions = [];
         }
@@ -53,6 +53,78 @@ class RuleController extends BaseController
             'error' => $error,
             'transactions' => $transactions,
         ]);
+    }
+
+    /**
+     * List all available rules
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function listAll(Request $request, Response $response, $args)
+    {
+        $rules = $this->container->db
+            ->fetch(Rule::class)
+            ->joinRelated('category')
+            ->orderBy('category.top')
+            ->orderBy('category.label')
+            ->all();
+
+        return $this->view->render($response, 'rules.twig', [
+            'title' => 'Rules',
+            'rules' => $rules,
+        ]);
+    }
+
+    /**
+     * Delete this rule and redirect back to the list
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     * @throws NotFoundException
+     */
+    public function remove(Request $request, Response $response, $args)
+    {
+        $rule = $this->container->db->fetch(Rule::class, $args['id']);
+        if ($rule === null) {
+            throw new NotFoundException($request, $response);
+        }
+        $this->container->db->delete($rule);
+        return $response->withRedirect($this->container->router->pathFor('rules'));
+    }
+
+    /**
+     * Enable this rule and (re-)apply it
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     * @throws NotFoundException
+     */
+    public function enable(Request $request, Response $response, $args)
+    {
+        /** @var Rule $rule */
+        $rule = $this->container->db->fetch(Rule::class, $args['id']);
+        if ($rule === null) {
+            throw new NotFoundException($request, $response);
+        }
+
+        $rule->enabled = 1;
+        $rule = $rule->save();
+
+        $query = $rule->matchTransactionsQuery();
+        $txs = $query->all();
+        foreach ($txs as $tx) {
+            $tx->categoryId = $rule->category_id;
+            $tx->save();
+        }
+
+        return $response->withRedirect($this->container->router->pathFor('rule', ['id' => $rule->id]));
     }
 
     /**
