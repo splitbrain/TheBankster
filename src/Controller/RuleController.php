@@ -11,6 +11,13 @@ use splitbrain\TheBankster\Entity\Rule;
 class RuleController extends BaseController
 {
 
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @param array $args
+     * @return \Psr\Http\Message\ResponseInterface|static
+     * @throws NotFoundException
+     */
     public function __invoke(Request $request, Response $response, $args)
     {
         $error = '';
@@ -48,6 +55,13 @@ class RuleController extends BaseController
         ]);
     }
 
+    /**
+     * Adds the post data to the given rule
+     *
+     * @param Rule $rule
+     * @param array $post
+     * @throws \Exception
+     */
     protected function applyPostData(Rule $rule, array $post)
     {
         $ok = false;
@@ -80,6 +94,11 @@ class RuleController extends BaseController
         return $accounts;
     }
 
+    /**
+     * Get a nested list of available categories
+     *
+     * @return array
+     */
     protected function getCategories()
     {
         $data = [];
