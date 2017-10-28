@@ -24,7 +24,7 @@
             <td>
                 {% if tx.category.label %}
                     <a href="{{ path_for('chart', {'top': tx.category.top}) }}">{{ tx.category.top }}</a><br/>
-                    {{ tx.category.label }}
+                    ↳<a href="{{ path_for('chart', {'top': tx.category.top, 'sub': tx.category.label }) }}">{{ tx.category.label }}</a>
                 {% else %}
                     <a href="{{ path_for('rule') }}?{{ {
                         'account': tx.account,

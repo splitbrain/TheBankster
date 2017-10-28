@@ -7,9 +7,10 @@
         <div id="chart_div" style="width:100%; height:600px;"></div>
     </section>
 
-
-
-
+    <section class="section">
+        <h2 class="subtitle">{{ subtitle }}</h2>
+        {% include 'partial/transactions.twig' %}
+    </section>
 {% endblock %}
 
 {% block script %}
@@ -23,7 +24,7 @@
 
         function drawBasic() {
             var data = google.visualization.arrayToDataTable({{ data|raw }});
-            var istop = {{ istop }};
+            var zoom = {{ zoom }};
 
             var options = {
                 chartArea: {
@@ -39,12 +40,27 @@
             var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
             chart.draw(data, options);
 
-            if (!istop) {
-                google.visualization.events.addListener(chart, 'select', function selectHandler(e) {
-                    var col = chart.getSelection()[0].column;
-                    window.location.href += encodeURIComponent(data.getColumnLabel(col));
-                });
-            }
+            // allow zooming in and limit to months
+            google.visualization.events.addListener(chart, 'select', function selectHandler(e) {
+                var sel = chart.getSelection();
+                if (!sel.length) return;
+
+                var col = sel[0].column;
+                var row = sel[0].row;
+                var label = data.getColumnLabel(col);
+                var date = '';
+                if (row) date = data.getValue(row, 0);
+
+                var newloc = window.location.pathname;
+                if (zoom && (label.substr(0, 1) !== '[')) {
+                    newloc += '/' + encodeURIComponent(label);
+                }
+                if (date) {
+                    newloc += '?date=' + encodeURIComponent(date);
+                }
+
+                window.location.href = newloc;
+            });
         }
     </script>
 {% endblock script %}

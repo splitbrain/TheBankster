@@ -46,7 +46,7 @@ class App
     public function run()
     {
 
-        $this->app->get('/chart/[{top}]', ChartController::class)->setName('chart');
+        $this->app->get('/chart[/{top}[/{sub}]]', ChartController::class)->setName('chart');
 
         $this->app->get('/category/del/{id}', CategoryController::class . ':remove')->setName('category-del');
         $this->app->any('/category/[{id}]', CategoryController::class)->setName('category');
