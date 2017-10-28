@@ -78,8 +78,44 @@ class ChartController extends BaseController
                 'zoom' => (int)$zoom,
                 'transactions' => $transactions,
                 'categories' => Category::formList(),
+                'top' => $top,
+                'sub' => $sub,
+                'date' => $date,
+                'breadcrumbs' => $this->makeBreadcrumbs($top, $sub, $date),
             ]
         );
+    }
+
+    /**
+     * Build the bread crumb array
+     *
+     * @param string $top
+     * @param string $sub
+     * @param string $date
+     * @return array
+     */
+    protected function makeBreadcrumbs($top, $sub, $date)
+    {
+        $R = $this->container->router;
+
+        $crumbs = [];
+        $crumbs['Home'] = $R->pathFor('home');
+
+        $data = [];
+        $crumbs['Categories'] = $R->pathFor('chart', $data);
+        if ($top !== '') {
+            $data['top'] = $top;
+            $crumbs[$top] = $R->pathFor('chart', $data);
+        }
+        if ($sub !== '') {
+            $data['sub'] = $sub;
+            $crumbs[$sub] = $R->pathFor('chart', $data);
+        }
+        if($date !== '') {
+            $crumbs[$date] = $R->pathFor('chart', $data, ['date' => $date]);
+        }
+
+        return $crumbs;
     }
 
     /**

@@ -32,11 +32,19 @@ class CategoryController extends BaseController
             }
         }
 
+        $title = $cat->id ? 'Edit Category ' . $cat->id : 'Create Category';
+        $breadcrumbs = [
+            'Home' => $this->container->router->pathFor('home'),
+            'Categories' => $this->container->router->pathFor('categories'),
+            $title => $this->container->router->pathFor('category', ['id' => $cat->id]),
+        ];
+
         return $this->view->render($response, 'category.twig',
             [
-                'title' => $cat->id ? 'Edit Category ' . $cat->id : 'Create Category',
+                'title' => $title,
                 'category' => $cat,
                 'error' => $error,
+                'breadcrumbs' => $breadcrumbs,
             ]
         );
     }
@@ -57,9 +65,15 @@ class CategoryController extends BaseController
             ->orderBy('label')
             ->all();
 
+        $breadcrumbs = [
+            'Home' => $this->container->router->pathFor('home'),
+            'Categories' => $this->container->router->pathFor('categories')
+        ];
+
         return $this->view->render($response, 'categories.twig', [
             'title' => 'Categories',
             'categories' => $cats,
+            'breadcrumbs' => $breadcrumbs,
         ]);
     }
 

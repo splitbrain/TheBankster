@@ -2,60 +2,52 @@
 {% import 'macro/form.twig' as form %}
 
 {% block content %}
-    <section class="section">
-        <h1 class="title">{{ title }}</h1>
+    <h1 class="title">{{ title }}</h1>
 
-        {% if error %}
-            <div class="notification is-danger">
-                {{ error }}
+    {% if error %}
+        <div class="notification is-danger">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    <form action="{{ path_for('category', {'id': category.id}) }}" method="post">
+        <div class="columns">
+            <div class="column">
+                <div class="box">
+                    {{ form.input(
+                    'Top Level',
+                    'top',
+                    'Categories are grouped under their top level name',
+                    category.top
+                    ) }}
+                    {{ form.input(
+                    'Category',
+                    'label',
+                    'The name of this category',
+                    category.label
+                    ) }}
+                </div>
             </div>
-        {% endif %}
 
-        <form action="{{ path_for('category', {'id': category.id}) }}" method="post">
-            <div class="columns">
-                <div class="column">
-                    <div class="box">
-                        {{ form.input(
-                        'Top Level',
-                        'top',
-                        'Categories are grouped under their top level name',
-                        category.top
-                        ) }}
-                        {{ form.input(
-                        'Category',
-                        'label',
-                        'The name of this category',
-                        category.label
-                        ) }}
-                    </div>
+            <div class="column">
+                <div class="box">
+                    <button class="button is-primary" type="submit">Save Category</button>
                 </div>
 
-                <div class="column">
+                {% if category.id %}
                     <div class="box">
-                        <button class="button is-primary" type="submit">Save Category</button>
+                        <a href="{{ path_for('category-del', {'id': category.id}) }}"
+                           class="button is-danger really-del"
+                           type="submit">Delete Category</a>
+
+                        <p class="help">
+                            Deleting a category will disassociate it from all it's transactions.
+                            All rules for this category will be deleted.
+                        </p>
                     </div>
-
-                    {% if category.id %}
-                        <div class="box">
-                            <a href="{{ path_for('category-del', {'id': category.id}) }}"
-                               class="button is-danger really-del"
-                               type="submit">Delete Category</a>
-
-                            <p class="help">
-                                Deleting a category will disassociate it from all it's transactions.
-                                All rules for this category will be deleted.
-                            </p>
-                        </div>
-                    {% endif %}
-                </div>
-
+                {% endif %}
             </div>
-        </form>
-    </section>
-    <section class="section">
-        {% if rule.id %}
-            <h2 class="subtitle">Matching Transactions</h2>
-            {% include 'partial/transactions.twig' %}
-        {% endif %}
-    </section>
+
+        </div>
+    </form>
 {% endblock %}

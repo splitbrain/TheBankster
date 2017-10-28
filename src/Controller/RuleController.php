@@ -50,13 +50,22 @@ class RuleController extends BaseController
             $transactions = [];
         }
 
+
+        $title = ($rule->id) ? 'Edit Rule ' . $rule->id : 'Add a Rule';
+        $breadcrumbs = [
+            'Home' => $this->container->router->pathFor('home'),
+            'Rules' => $this->container->router->pathFor('rules'),
+            $title => $this->container->router->pathFor('rule', ['id' => $rule->id]),
+        ];
+
         return $this->view->render($response, 'rule.twig', [
-            'title' => ($rule->id) ? 'Edit Rule ' . $rule->id : 'Add a Rule',
+            'title' => $title,
             'accounts' => $this->getAccounts(),
             'categories' => Category::formList(),
             'rule' => $rule,
             'error' => $error,
             'transactions' => $transactions,
+            'breadcrumbs' => $breadcrumbs,
         ]);
     }
 
@@ -77,9 +86,15 @@ class RuleController extends BaseController
             ->orderBy('category.label')
             ->all();
 
+        $breadcrumbs = [
+            'Home' => $this->container->router->pathFor('home'),
+            'Rules' => $this->container->router->pathFor('rules')
+        ];
+
         return $this->view->render($response, 'rules.twig', [
             'title' => 'Rules',
             'rules' => $rules,
+            'breadcrumbs' => $breadcrumbs,
         ]);
     }
 

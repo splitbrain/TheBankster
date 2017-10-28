@@ -13,9 +13,25 @@
 
 {% include 'partial/navigation.twig' %}
 
-<main class="container">
-    {% block content %}
-    {% endblock %}
+<main>
+    {% if breadcrumbs %}
+        <nav class="breadcrumb is-centered has-arrow-separator" aria-label="breadcrumbs">
+            <ul>
+                {% for label,link in breadcrumbs %}
+                    {% if loop.last %}
+                        <li class="is-active"><a href="{{ link }}" aria-current="page">{{ label }}</a></li>
+                    {% else %}
+                        <li><a href="{{ link }}">{{ label }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </nav>
+    {% endif %}
+
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
 </main>
 
 <script>BASE_URL = '{{ base_url() }}';</script>

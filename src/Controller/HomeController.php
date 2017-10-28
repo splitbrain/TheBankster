@@ -20,12 +20,16 @@ class HomeController extends BaseController
             ->orderBy('ts', 'DESC')
             ->all();
 
+        $breadcrumbs = [
+            'Home' => $this->container->router->pathFor('home'),
+        ];
 
         $this->view->render($response, 'home.twig',
             [
                 'title' => 'Home',
                 'transactions'=>$txs,
                 'categories' => Category::formList(),
+                'breadcrumbs' => $breadcrumbs,
             ]
         );
     }

@@ -26,11 +26,17 @@ class TransactionController extends BaseController
             ->where('category_id IS NULL')
             ->orderBy('ts', 'DESC')
             ->all();
+        
+        $breadcrumbs = [
+            'Home' => $this->container->router->pathFor('home'),
+            'Uncategorized' => $this->container->router->pathFor('uncategorized')
+        ];
 
         return $this->view->render($response, 'transactions.twig', [
             'title' => 'Uncategorized Transactions',
             'transactions' => $transactions,
             'categories' => Category::formList(),
+            'breadcrumbs' => $breadcrumbs,
         ]);
     }
 

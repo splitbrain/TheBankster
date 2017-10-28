@@ -2,121 +2,118 @@
 {% import 'macro/form.twig' as form %}
 
 {% block content %}
-    <section class="section">
-        <h1 class="title">{{ title }}</h1>
+    <h1 class="title">{{ title }}</h1>
 
-        {% if error %}
-            <div class="notification is-danger">
-                {{ error }}
+    {% if error %}
+        <div class="notification is-danger">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    <form action="{{ path_for('rule', {'id': rule.id}) }}" method="post">
+        <div class="columns">
+            <div class="column">
+                <div class="box">
+                    {{ form.dropdown(
+                    'Account',
+                    'account',
+                    'Apply rule to this account only',
+                    accounts,
+                    rule.account
+                    ) }}
+                    {{ form.dropdown(
+                    'Spending/Income',
+                    'debit',
+                    'Match only spending or income',
+                    {'':'Both', '-1':'Spending', '1':'Income'},
+                    rule.debit
+                    ) }}
+                    {{ form.input(
+                    'Description',
+                    'description',
+                    'Match against description',
+                    rule.description
+                    ) }}
+                    {{ form.input(
+                    'Issuer Name',
+                    'xName',
+                    'Match against transaction issuer\'s name',
+                    rule.xName
+                    ) }}
+                    {{ form.input(
+                    'Issuer Bank',
+                    'xBank',
+                    'Match against transaction issuer\'s bank',
+                    rule.xBank
+                    ) }}
+                    {{ form.input(
+                    'Issuer Account',
+                    'xAcct',
+                    'Match against transaction issuer\'s account',
+                    rule.xAcct
+                    ) }}
+                </div>
             </div>
-        {% endif %}
 
-        <form action="{{ path_for('rule', {'id': rule.id}) }}" method="post">
-            <div class="columns">
-                <div class="column">
-                    <div class="box">
-                        {{ form.dropdown(
-                        'Account',
-                        'account',
-                        'Apply rule to this account only',
-                        accounts,
-                        rule.account
-                        ) }}
-                        {{ form.dropdown(
-                        'Spending/Income',
-                        'debit',
-                        'Match only spending or income',
-                        {'':'Both', '-1':'Spending', '1':'Income'},
-                        rule.debit
-                        ) }}
-                        {{ form.input(
-                        'Description',
-                        'description',
-                        'Match against description',
-                        rule.description
-                        ) }}
-                        {{ form.input(
-                        'Issuer Name',
-                        'xName',
-                        'Match against transaction issuer\'s name',
-                        rule.xName
-                        ) }}
-                        {{ form.input(
-                        'Issuer Bank',
-                        'xBank',
-                        'Match against transaction issuer\'s bank',
-                        rule.xBank
-                        ) }}
-                        {{ form.input(
-                        'Issuer Account',
-                        'xAcct',
-                        'Match against transaction issuer\'s account',
-                        rule.xAcct
-                        ) }}
-                    </div>
+            <div class="column">
+                <div class="box">
+                    {{ form.deepDropdown(
+                    'Category',
+                    'categoryId',
+                    'This rule should assign this category',
+                    categories,
+                    rule.categoryId
+                    ) }}
                 </div>
 
-                <div class="column">
-                    <div class="box">
-                        {{ form.deepDropdown(
-                        'Category',
-                        'categoryId',
-                        'This rule should assign this category',
-                        categories,
-                        rule.categoryId
-                        ) }}
-                    </div>
-
-                    <div class="box">
-                        {% if rule.id %}
-                            <button class="button is-primary" type="submit">Update Rule</button>
-
-                            <p class="help">
-                                This saves the rule and updates the preview of matching transactions below.
-                            </p>
-                        {% else %}
-                            <button class="button is-primary" type="submit">Create Rule</button>
-
-                            <p class="help">
-                                The rule will be created disabled and can be previewed before enabling and applying it.
-                            </p>
-                        {% endif %}
-                    </div>
-
+                <div class="box">
                     {% if rule.id %}
-                        <div class="box">
-                            <a href="{{ path_for('rule-on', {'id': rule.id}) }}"
-                               class="button is-info"
-                               type="submit">{% if rule.enabled %}Reapply Rule{% else %}Enable Rule{% endif %}</a>
+                        <button class="button is-primary" type="submit">Update Rule</button>
 
-                            <p class="help">
-                                This will apply this rule's category to all matching transactions, regardless of
-                                their currently assigned category. Be sure you have checked the preview of matching
-                                transactions first.
-                            </p>
-                        </div>
-                    {% endif %}
+                        <p class="help">
+                            This saves the rule and updates the preview of matching transactions below.
+                        </p>
+                    {% else %}
+                        <button class="button is-primary" type="submit">Create Rule</button>
 
-                    {% if rule.id %}
-                        <div class="box">
-                            <a href="{{ path_for('rule-del', {'id': rule.id}) }}"
-                               class="button is-danger really-del"
-                               type="submit">Delete Rule</a>
-
-                            <p class="help">
-                                Deleting a rule will not change any previously made category assignments.
-                            </p>
-                        </div>
+                        <p class="help">
+                            The rule will be created disabled and can be previewed before enabling and applying it.
+                        </p>
                     {% endif %}
                 </div>
 
+                {% if rule.id %}
+                    <div class="box">
+                        <a href="{{ path_for('rule-on', {'id': rule.id}) }}"
+                           class="button is-info"
+                           type="submit">{% if rule.enabled %}Reapply Rule{% else %}Enable Rule{% endif %}</a>
+
+                        <p class="help">
+                            This will apply this rule's category to all matching transactions, regardless of
+                            their currently assigned category. Be sure you have checked the preview of matching
+                            transactions first.
+                        </p>
+                    </div>
+                {% endif %}
+
+                {% if rule.id %}
+                    <div class="box">
+                        <a href="{{ path_for('rule-del', {'id': rule.id}) }}"
+                           class="button is-danger really-del"
+                           type="submit">Delete Rule</a>
+
+                        <p class="help">
+                            Deleting a rule will not change any previously made category assignments.
+                        </p>
+                    </div>
+                {% endif %}
             </div>
-        </form>
-    </section>
-    <section class="section">
-        {% if rule.id %}
-            <h2 class="subtitle">Matching Transactions</h2>
-            {% include 'partial/transactions.twig' %}
-        {% endif %}
-    </section>
+
+        </div>
+    </form>
+
+    {% if rule.id %}
+        <h2 class="subtitle">Matching Transactions</h2>
+        {% include 'partial/transactions.twig' %}
+    {% endif %}
 {% endblock %}

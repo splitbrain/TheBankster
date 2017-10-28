@@ -60,7 +60,6 @@ class Container extends \Slim\Container
         $this['db']->getConnection()->exec('PRAGMA foreign_keys = ON');
         $this['db']->getConnection()->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
 
-
         // create the Twig view
         $this['view'] = function () {
             $view = new Twig(__DIR__ . '/../views', [
