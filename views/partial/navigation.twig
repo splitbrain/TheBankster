@@ -1,0 +1,14 @@
+<nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="{{ base_url() }}">TheBankster</a>
+    </div>
+    <div class="navbar-menu">
+        <div class="navbar-start">
+            <a href="{{ path_for('chart') }}" class="navbar-item">Categories</a>
+        </div>
+
+        <div class="navbar-end">
+            <a href="{{ path_for('rule') }}" class="navbar-item">Add Rule</a>
+        </div>
+    </div>
+</nav>

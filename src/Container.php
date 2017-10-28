@@ -50,18 +50,16 @@ class Container extends \Slim\Container
         $this->logger = new NullLogger();
 
 
-        // DataBase Entity Manager
-        $this['db'] = function () {
-            $em = new EntityManager([
-                EntityManager::OPT_CONNECTION => new DbConfig(
-                    'sqlite',
-                    __DIR__ . '/../data.sqlite3'
-                )
-            ]);
-            $em->getConnection()->exec('PRAGMA foreign_keys = ON');
-            $em->getConnection()->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
-            return $em;
-        };
+        // DataBase Entity Manager (always initialized)
+        $this['db'] = new EntityManager([
+            EntityManager::OPT_CONNECTION => new DbConfig(
+                'sqlite',
+                __DIR__ . '/../data.sqlite3'
+            )
+        ]);
+        $this['db']->getConnection()->exec('PRAGMA foreign_keys = ON');
+        $this['db']->getConnection()->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+
 
         // create the Twig view
         $this['view'] = function () {

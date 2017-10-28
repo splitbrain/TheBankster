@@ -4,6 +4,7 @@ namespace splitbrain\TheBankster;
 
 use splitbrain\TheBankster\Controller\ChartController;
 use splitbrain\TheBankster\Controller\HomeController;
+use splitbrain\TheBankster\Controller\RuleController;
 
 
 /**
@@ -43,7 +44,8 @@ class App
     public function run()
     {
 
-        $this->app->get('/chart[/{top}]', ChartController::class)->setName('chart');
+        $this->app->get('/chart/[{top}]', ChartController::class)->setName('chart');
+        $this->app->any('/rule/[{id}]', RuleController::class)->setName('rule');
         $this->app->get('/', HomeController::class)->setName('home');
 
         $this->app->run();

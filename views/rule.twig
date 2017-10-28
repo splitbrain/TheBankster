@@ -1,0 +1,92 @@
+{% extends 'app.twig' %}
+{% import 'macro/form.twig' as form %}
+
+{% block content %}
+    <section class="section">
+        <h1 class="title">{{ title }}</h1>
+
+        {% if error %}
+            <div class="notification is-danger">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <form action="{{ path_for('rule', {'id': rule.id}) }}" method="post">
+            <div class="columns">
+                <div class="column">
+                    <div class="box">
+                        {{ form.dropdown(
+                        'Account',
+                        'account',
+                        'Apply rule to this account only',
+                        accounts,
+                        rule.account
+                        ) }}
+                        {{ form.dropdown(
+                        'Spending/Income',
+                        'debit',
+                        'Match only spending or income',
+                        {'':'Both', '-1':'Spending', '1':'Income'},
+                        rule.debit
+                        ) }}
+                        {{ form.input(
+                        'Description',
+                        'description',
+                        'Match against description',
+                        rule.description
+                        ) }}
+                        {{ form.input(
+                        'Issuer Name',
+                        'xName',
+                        'Match against transaction issuer\'s name',
+                        rule.xName
+                        ) }}
+                        {{ form.input(
+                        'Issuer Bank',
+                        'xBank',
+                        'Match against transaction issuer\'s bank',
+                        rule.xBank
+                        ) }}
+                        {{ form.input(
+                        'Issuer Account',
+                        'xAccount',
+                        'Match against transaction issuer\'s account',
+                        rule.xAccount
+                        ) }}
+                    </div>
+                </div>
+
+                <div class="column">
+                    <div class="box">
+                        {{ form.deepDropdown(
+                        'Category',
+                        'categoryId',
+                        'This rule should assign this category',
+                        categories,
+                        rule.categoryId
+                        ) }}
+                    </div>
+
+                    <div class="box">
+                        {% if rule.id %}
+                            <button class="button is-primary" type="submit">Update Rule</button>
+                        {% else %}
+                            <button class="button is-primary" type="submit">Create Rule</button>
+
+                            <p class="help">
+                                The rule will be created disabled and can be previewed before enabling and applying it.
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </section>
+    <section class="section">
+        {% if rule.id %}
+            <h2 class="subtitle">Matching Transactions</h2>
+            {% include 'partial/transactions.twig' %}
+        {% endif %}
+    </section>
+{% endblock %}

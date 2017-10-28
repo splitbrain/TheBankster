@@ -1,0 +1,30 @@
+<table class="table is-striped is-hoverable is-fullwidth">
+    <thead>
+    <tr>
+        <th>Account</th>
+        <th>Date</th>
+        <th>Amount</th>
+        <th>Description</th>
+        <th>Issuer Name</th>
+        <th>Issuer Bank<br/>Issuer Account</th>
+        <th>Category</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {% for tx in transactions %}
+        <tr {% if tx.category.top == '-' %}style="opacity: 0.3"{% endif %}>
+            <td>{{ tx.account }}</td>
+            <td>{{ tx.datetime.format('Y-m-d') }}</td>
+            <td class="has-text-right {% if tx.amount < 0 %}has-text-danger{% else %}has-text-success{% endif %}">{{ "%.2f"|format(tx.amount) }}</td>
+            <td>{{ tx.cleanDescription|nl2br }}</td>
+            <td>{{ tx.xName }}</td>
+            <td>{{ [tx.xBank, tx.xAcct] | join("\n") |nl2br }}</td>
+            <td>
+                <a href="{{ path_for('chart', {'top': tx.category.top}) }}">{{ tx.category.top }}</a><br />
+                {{ tx.category.label }}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

@@ -23,7 +23,7 @@ class ChartController extends BaseController
 
         $this->view->render($response, 'chart.twig',
             [
-                'title' => 'Home',
+                'title' => isset($args['top']) ? 'Category ' . $args['top'] : 'Categories',
                 'data' => json_encode($rows, JSON_PRETTY_PRINT)
             ]
         );
@@ -46,7 +46,7 @@ class ChartController extends BaseController
         foreach ($data as $row) {
             $dt = $row['dt'];
             $cat = $row['cat'];
-            $val = (float)$row['val'];
+            $val = round((float)$row['val'], 2);
 
             // initialize
             if (!isset($config[$dt])) {

@@ -31,4 +31,9 @@ class Category extends Entity
         $sql = 'UPDATE "category" SET top = :new WHERE top = :old';
         return $db->exec($sql, [':new' => $new, ':old' => $old]);
     }
+
+    public function __isset($value)
+    {
+        return true;
+    }
 }

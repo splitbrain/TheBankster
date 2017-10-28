@@ -1,0 +1,50 @@
+{% macro input(label, name, help, value, type) %}
+    <div class="field">
+        <label class="label" for="{{ name }}">{{ label }}</label>
+        <div class="control">
+            <input class="{{ type|default('input') }}"
+                   type="{{ type|default('text') }}"
+                   name="{{ name }}"
+                   value="{{ value }}"
+                   id="{{ name }}"/>
+        </div>
+        <p class="help">{{ help }}</p>
+    </div>
+{% endmacro %}
+
+{% macro dropdown(label, name, help, data, value) %}
+    <div class="field">
+        <label class="label" for="{{ name }}">{{ label }}</label>
+        <div class="control">
+            <div class="select">
+                <select name="{{ name }}" id="{{ name }}">
+                    {% for key,val in data %}
+                        <option value="{{ key }}" {% if key == value %}selected="selected"{% endif %}>{{ val }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <p class="help">{{ help }}</p>
+    </div>
+{% endmacro %}
+
+{% macro deepDropdown(label, name, help, data, value) %}
+    <div class="field">
+        <label class="label" for="{{ name }}">{{ label }}</label>
+        <div class="control">
+            <div class="select">
+                <select name="{{ name }}" id="{{ name }}">
+                    {% for group,sub in data %}
+                        <optgroup label="{{ group }}">
+                            {% for key,val in sub %}
+                                <option value="{{ key }}"
+                                        {% if key == value %}selected="selected"{% endif %}>{{ val }}</option>
+                            {% endfor %}
+                        </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <p class="help">{{ help }}</p>
+    </div>
+{% endmacro %}
