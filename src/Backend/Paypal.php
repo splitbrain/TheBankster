@@ -64,6 +64,16 @@ class Paypal extends AbstractBackend
     }
 
     /** @inheritdoc */
+    public function checkSetup()
+    {
+        // check for transactions right now
+        $this->findTransactions(new \DateTime());
+
+        // if there was no exception, we're good to go
+        return 'Paypal API seems to be set up correctly';
+    }
+
+    /** @inheritdoc */
     public function importTransactions(\DateTime $since)
     {
         $transactions = $this->findTransactions($since);
@@ -112,8 +122,13 @@ class Paypal extends AbstractBackend
         if ($fields['ACK'] == 'SuccessWithWarning') {
             $rerun = true;
         } else if ($fields['ACK'] != 'Success') {
-            print_r($fields);
-            throw new \Exception('Paypal returned wrong acknowledgement');
+            $error = [];
+            $error[] = 'Paypal returned wrong acknowledgement';
+            $error[] = $fields['ACK'];
+            if (isset($fields['L_SHORTMESSAGE0'])) $error[] = $fields['L_SHORTMESSAGE0'];
+            if (isset($fields['L_LONGMESSAGE0'])) $error[] = $fields['L_LONGMESSAGE0'];
+            //print_r($fields);
+            throw new \Exception(join("\n", $error));
         }
 
         $data = [];

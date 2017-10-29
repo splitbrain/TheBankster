@@ -46,6 +46,15 @@ class TargoBank extends AbstractBackend
         ];
     }
 
+    /** @inheritdoc */
+    public function checkSetup()
+    {
+        if (!$this->login($this->config['user'], $this->config['pass'])) {
+            throw new \Exception('Failed to log in to TargoBank');
+        }
+
+        return 'Log in to TargoBank webinterface successful';
+    }
 
     /** @inheritdoc */
     public function importTransactions(\DateTime $since)

@@ -3,6 +3,7 @@
 namespace splitbrain\TheBankster\Entity;
 
 use ORM\Entity;
+use splitbrain\TheBankster\Backend\AbstractBackend;
 
 class Account extends Entity
 {
@@ -84,5 +85,29 @@ class Account extends Entity
                 }
             }
         }
+    }
+
+    /**
+     * Executes the check of setup at the backend
+     *
+     * @return array
+     */
+    public function checkConfig() {
+        $result = [
+            'ok'  => true,
+            'info' => '',
+        ];
+
+        try {
+            $class = '\\splitbrain\\TheBankster\\Backend\\'.$this->backend;
+            /** @var AbstractBackend $obj */
+            $obj = new $class($this->configuration, $this->account);
+            $result['info'] = $obj->checkSetup();
+        } catch (\Exception $e) {
+            $result['ok'] = false;
+            $result['info'] = $e->getMessage();
+        }
+
+        return $result;
     }
 }

@@ -43,6 +43,15 @@
                 <div class="box">
                     <button class="button is-primary" type="submit">Save Account</button>
                 </div>
+
+                {% if not isnew %}
+                    {% set check = account.checkConfig() %}
+
+                    <div class="notification {% if check.ok %}is-success{% else %}is-danger{% endif %}">
+                        {{ check.info |nl2br }}
+                    </div>
+
+                {% endif %}
             </div>
         </div>
     </form>

@@ -43,6 +43,12 @@ abstract class AbstractBackend
     abstract public static function configDescription();
 
     /**
+     * @throws \Exception when anything is not right, message is shown to the user
+     * @return string Any success mesage to show to the user
+     */
+    abstract public function checkSetup();
+
+    /**
      * Return all statements since the given DateTime
      *
      * Backends that can not select by time should return as many statements as possible

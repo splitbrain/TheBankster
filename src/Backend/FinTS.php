@@ -48,9 +48,19 @@ class FinTS extends AbstractBackend
         ];
     }
 
-
     /** @inheritdoc */
-    public function importTransactions(\DateTime $since)
+    public function checkSetup()
+    {
+        $account = $this->identifyAccount();
+        return 'Connected successfully to account ' . $account->getAccountNumber();
+    }
+
+    /**
+     * Get the account to use
+     *
+     * @return \Fhp\Model\SEPAAccount
+     */
+    protected function identifyAccount()
     {
         $accounts = $this->fints->getSEPAAccounts();
         $this->logger->info('Found  {count} accounts.', ['count' => count($accounts)]);
@@ -67,6 +77,14 @@ class FinTS extends AbstractBackend
                 }
             }
         }
+
+        return $account;
+    }
+
+    /** @inheritdoc */
+    public function importTransactions(\DateTime $since)
+    {
+        $account = $this->identifyAccount();
 
         // get all the transactions
         $soa = $this->fints->getStatementOfAccount($account, $since, new \DateTime());
