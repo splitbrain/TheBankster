@@ -46,11 +46,15 @@
 
                 {% if not isnew %}
                     {% set check = account.checkConfig() %}
-
                     <div class="notification {% if check.ok %}is-success{% else %}is-danger{% endif %}">
                         {{ check.info |nl2br }}
                     </div>
 
+                    <div class="box">
+                        <a href="{{ path_for('account-del', {'account': account.account}) }}"
+                           class="button is-danger really-del">Delete Account</a>
+                        <p class="help">Note: Transactions and rules referencing this account will <b>not</b> be deleted.</p>
+                    </div>
                 {% endif %}
             </div>
         </div>

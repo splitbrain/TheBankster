@@ -50,8 +50,9 @@ class App
         $this->app->get('/chart[/{top}[/{sub}]]', ChartController::class)->setName('chart');
 
         $this->app->any('/accounts', AccountController::class . ':listAll')->setName('accounts');
-        $this->app->any('/account/{account}', AccountController::class)->setName('account');
-        $this->app->any('/newaccount/{backend}', AccountController::class . ':newAccount')->setName('account-new');
+        $this->app->any('/accounts/edit/{account}', AccountController::class)->setName('account');
+        $this->app->any('/accounts/del/{account}', AccountController::class . ':remove')->setName('account-del');
+        $this->app->any('/accounts/new/{backend}', AccountController::class . ':add')->setName('account-new');
 
         $this->app->get('/category/del/{id}', CategoryController::class . ':remove')->setName('category-del');
         $this->app->any('/category/[{id}]', CategoryController::class)->setName('category');

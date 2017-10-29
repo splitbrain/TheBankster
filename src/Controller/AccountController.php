@@ -5,12 +5,13 @@ namespace splitbrain\TheBankster\Controller;
 use Slim\Exception\NotFoundException;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use splitbrain\TheBankster\Backend\AbstractBackend;
 use splitbrain\TheBankster\Entity\Account;
 
 class AccountController extends BaseController
 {
     /**
+     * Edit existing account
+     *
      * @param Request $request
      * @param Response $response
      * @param $args
@@ -27,8 +28,15 @@ class AccountController extends BaseController
         return $this->handleAccount($request, $response, $account, false);
     }
 
-
-    public function newAccount(Request $request, Response $response, $args)
+    /**
+     * Create new Account
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return \Psr\Http\Message\ResponseInterface|AccountController
+     */
+    public function add(Request $request, Response $response, $args)
     {
         $backend = $args['backend'];
         $account = new Account();
@@ -37,7 +45,35 @@ class AccountController extends BaseController
         return $this->handleAccount($request, $response, $account, true);
     }
 
+    /**
+     * Delete Account
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return \Psr\Http\Message\ResponseInterface|AccountController
+     * @throws NotFoundException
+     */
+    public function remove(Request $request, Response $response, $args)
+    {
+        $account = $this->container->db->fetch(Account::class, $args['account']);
+        if (!$account) throw new NotFoundException($request, $response);
 
+        $this->container->db->delete($account);
+
+        return $response->withRedirect($this->container->router->pathFor('accounts'));
+    }
+
+
+    /**
+     * Handles account creation and editing
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param Account $account
+     * @param bool $isnew
+     * @return \Psr\Http\Message\ResponseInterface|static
+     */
     public function handleAccount(Request $request, Response $response, Account $account, bool $isnew)
     {
         $configDesc = $account->getConfigurationDescription();
@@ -85,6 +121,13 @@ class AccountController extends BaseController
         );
     }
 
+    /**
+     * Show all the accounts
+     *
+     * @param Request $request
+     * @param Response $response
+     * @return \Psr\Http\Message\ResponseInterface
+     */
     public function listAll(Request $request, Response $response)
     {
         $accounts = $this->container->db->fetch(Account::class)->orderBy('account')->all();
