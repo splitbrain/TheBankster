@@ -2,13 +2,13 @@
     <div class="field">
         <label class="label" for="{{ name }}">{{ label }}</label>
         <div class="control">
-            <input class="{{ type|default('input') }}"
+            <input class="input"
                    type="{{ type|default('text') }}"
                    name="{{ name }}"
                    value="{{ value }}"
                    id="{{ name }}"/>
         </div>
-        <p class="help">{{ help }}</p>
+        <p class="help">{{ help | autolink }}</p>
     </div>
 {% endmacro %}
 
@@ -24,7 +24,7 @@
                 </select>
             </div>
         </div>
-        <p class="help">{{ help }}</p>
+        <p class="help">{{ help | autolink }}</p>
     </div>
 {% endmacro %}
 
@@ -45,6 +45,6 @@
                 </select>
             </div>
         </div>
-        <p class="help">{{ help }}</p>
+        <p class="help">{{ help | autolink }}</p>
     </div>
 {% endmacro %}

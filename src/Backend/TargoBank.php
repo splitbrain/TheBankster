@@ -38,6 +38,16 @@ class TargoBank extends AbstractBackend
     }
 
     /** @inheritdoc */
+    public static function configDescription()
+    {
+        return [
+            'user' => ['help' => 'Your online banking user name',],
+            'pass' => ['help' => 'Your online banking password', 'type' => 'password'],
+        ];
+    }
+
+
+    /** @inheritdoc */
     public function importTransactions(\DateTime $since)
     {
 

@@ -2,6 +2,7 @@
 
 namespace splitbrain\TheBankster;
 
+use manuelodelain\Twig\Extension\LinkifyExtension;
 use ORM\DbConfig;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -67,8 +68,16 @@ class Container extends \Slim\Container
                 'debug' => true,
             ]);
 
-            //set view variables
-            //$view->offsetSet('navigation', $this->navigation);
+            $view->getEnvironment()->addFilter(
+                new \Twig_Filter(
+                    'autolink',
+                    'autolink',
+                    [
+                        'pre_escape' => 'html',
+                        'is_safe' => array('html')
+                    ]
+                )
+            );
 
             $view->addExtension(new \Slim\Views\TwigExtension(
                 $this->router,

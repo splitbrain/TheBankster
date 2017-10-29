@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "1784ef6225212c871773df3f26c97fba",
+    "content-hash": "63c034e1dfbb206fd0b30842dd5ac3c7",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -257,6 +257,38 @@
                 "url"
             ],
             "time": "2017-03-20T17:10:46+00:00"
+        },
+        {
+            "name": "iamcal/lib_autolink",
+            "version": "v1.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/iamcal/lib_autolink.git",
+                "reference": "b3a86d8437e5d635fb85b155a86288d94f6a924d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/iamcal/lib_autolink/zipball/b3a86d8437e5d635fb85b155a86288d94f6a924d",
+                "reference": "b3a86d8437e5d635fb85b155a86288d94f6a924d",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "lib_autolink.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Adds anchors to urls in a text",
+            "keywords": [
+                "anchor",
+                "autolink",
+                "link"
+            ],
+            "time": "2015-05-22T17:10:41+00:00"
         },
         {
             "name": "mschindler83/fints-hbci-php",

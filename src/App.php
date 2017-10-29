@@ -2,6 +2,7 @@
 
 namespace splitbrain\TheBankster;
 
+use splitbrain\TheBankster\Controller\AccountController;
 use splitbrain\TheBankster\Controller\CategoryController;
 use splitbrain\TheBankster\Controller\ChartController;
 use splitbrain\TheBankster\Controller\HomeController;
@@ -47,6 +48,10 @@ class App
     {
 
         $this->app->get('/chart[/{top}[/{sub}]]', ChartController::class)->setName('chart');
+
+        $this->app->any('/accounts', AccountController::class . ':listAll')->setName('accounts');
+        $this->app->any('/account/{account}', AccountController::class)->setName('account');
+        $this->app->any('/newaccount/{backend}', AccountController::class . ':newAccount')->setName('account-new');
 
         $this->app->get('/category/del/{id}', CategoryController::class . ':remove')->setName('category-del');
         $this->app->any('/category/[{id}]', CategoryController::class)->setName('category');

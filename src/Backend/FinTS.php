@@ -25,6 +25,29 @@ class FinTS extends AbstractBackend
         );
     }
 
+    /** @inheritdoc */
+    public static function configDescription()
+    {
+        return [
+            'url' => [
+                'help' => 'The HBCI / FinTS API URL for your bank. See https://www.hbci-zka.de/institute/institut_select.php',
+            ],
+            'code' => [
+                'help' => 'Your bank code (aka Bankleitzahl)',
+            ],
+            'user' => [
+                'help' => 'Your online banking username / alias',
+            ],
+            'pass' => [
+                'help' => 'Your online banking PIN (NOT! the pin of your bank card!)',
+                'type' => 'password',
+            ],
+            'ident' => [
+                'optional' => true, 'help' => 'Optional. Your account number if the credentials above give access to multiple accounts',
+            ],
+        ];
+    }
+
 
     /** @inheritdoc */
     public function importTransactions(\DateTime $since)

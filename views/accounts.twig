@@ -1,0 +1,42 @@
+{% extends 'app.twig' %}
+
+{% block content %}
+    <div class="dropdown is-hoverable is-right is-pulled-right">
+        <div class="dropdown-trigger">
+            <button class="button is-primary" aria-haspopup="true" aria-controls="dropdown-menu">
+                Add new Account
+            </button>
+        </div>
+        <div class="dropdown-menu" id="dropdown-menu" role="menu">
+            <div class="dropdown-content">
+                {% for backend,info in backends %}
+                    <a href="{{ path_for('account-new', {'backend': backend}) }}"
+                       class="dropdown-item">{{ backend }}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <h1 class="title">{{ title }}</h1>
+
+    <table class="table is-striped is-hoverable is-fullwidth">
+        <thead>
+        <tr>
+            <th>Account</th>
+            <th>Backend</th>
+            <th></th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for account in accounts %}
+            <tr>
+                <td>{{ account.account }}</td>
+                <td>{{ account.backend }}</td>
+                <td><a href="{{ path_for('account', {'account': account.account}) }}">Edit</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

@@ -45,6 +45,23 @@ class Paypal extends AbstractBackend
         $this->convert = new CurrencyConvert();
     }
 
+    /** @inheritdoc */
+    public static function configDescription()
+    {
+        return [
+            'user' => [
+                'help' => 'Your API user created at https://www.paypal.com/de/cgi-bin/webscr?cmd=_profile-api-add-direct-access-show',
+            ],
+            'pass' => [
+                'help' => 'Your password for above user',
+                'type' => 'password',
+            ],
+            'signature' => [
+                'help' => 'Your signature for above user',
+                'type' => 'password',
+            ]
+        ];
+    }
 
     /** @inheritdoc */
     public function importTransactions(\DateTime $since)

@@ -4,6 +4,7 @@ namespace splitbrain\TheBankster\Backend;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use splitbrain\TheBankster\Entity\Transaction;
 
 abstract class AbstractBackend
 {
@@ -14,6 +15,11 @@ abstract class AbstractBackend
     /** @var LoggerInterface */
     protected $logger;
 
+    /**
+     * AbstractBackend constructor.
+     * @param array $config
+     * @param string $accountid
+     */
     public function __construct($config, $accountid)
     {
         $this->config = $config;
@@ -21,10 +27,20 @@ abstract class AbstractBackend
         $this->logger = new NullLogger();
     }
 
+    /**
+     * @param LoggerInterface $logger
+     */
     public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
     }
+
+    /**
+     * Describe what configuration is required for this backend
+     *
+     * @return array
+     */
+    abstract public static function configDescription();
 
     /**
      * Return all statements since the given DateTime
@@ -35,7 +51,12 @@ abstract class AbstractBackend
      */
     abstract public function importTransactions(\DateTime $since);
 
-    protected function storeTransaction(\splitbrain\TheBankster\Entity\Transaction $tx)
+    /**
+     * All Backends need to call this from their importTransactions() method
+     *
+     * @param Transaction $tx
+     */
+    protected function storeTransaction(Transaction $tx)
     {
         try {
             $tx->account = $this->accountid;
