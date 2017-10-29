@@ -46,9 +46,4 @@ class Category extends Entity
         }
         return $data;
     }
-
-    public function __isset($value)
-    {
-        return true;
-    }
 }

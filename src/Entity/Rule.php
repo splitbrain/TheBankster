@@ -74,9 +74,4 @@ class Rule extends Entity
 
         return $query;
     }
-
-    public function __isset($value)
-    {
-        return true;
-    }
 }

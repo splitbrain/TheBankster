@@ -815,16 +815,16 @@
         },
         {
             "name": "tflori/orm",
-            "version": "v1.2.0",
+            "version": "v1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tflori/orm.git",
-                "reference": "8654b4d82ae2636de371c4fb776cd801acd30daf"
+                "reference": "4fbbeb637847d97bfef8699ca5ea5ce42992193a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tflori/orm/zipball/8654b4d82ae2636de371c4fb776cd801acd30daf",
-                "reference": "8654b4d82ae2636de371c4fb776cd801acd30daf",
+                "url": "https://api.github.com/repos/tflori/orm/zipball/4fbbeb637847d97bfef8699ca5ea5ce42992193a",
+                "reference": "4fbbeb637847d97bfef8699ca5ea5ce42992193a",
                 "shasum": ""
             },
             "require": {
@@ -849,7 +849,7 @@
                 "MIT"
             ],
             "description": "lightweight object relational mapper",
-            "time": "2017-06-20T05:29:03+00:00"
+            "time": "2017-10-28T16:02:32+00:00"
         },
         {
             "name": "twig/twig",
