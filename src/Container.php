@@ -77,7 +77,18 @@ class Container extends \Slim\Container
             return $view;
         };
 
-
+        // custom error handlers
+        $this['errorHandler'] = function ($c) {
+            return new ErrorHandler($c);
+        };
+        $this['phpErrorHandler'] = function ($c) {
+            return new ErrorHandler($c);
+        };
+        $this['notFoundHandler'] = function ($c) {
+            return function ($request, $response) use ($c) {
+                return (new ErrorHandler($c))->notFound($request, $response);
+            };
+        };
     }
 
     /**

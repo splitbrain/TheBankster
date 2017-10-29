@@ -9,10 +9,13 @@ use splitbrain\TheBankster\Entity\Transaction;
 
 class HomeController extends BaseController
 {
-
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @return \Psr\Http\Message\ResponseInterface
+     */
     public function __invoke(Request $request, Response $response)
     {
-
         $beginOfMonth = strtotime('first day of this month 00:00');
         $txs = $this->container->db
             ->fetch(Transaction::class)
@@ -24,7 +27,7 @@ class HomeController extends BaseController
             'Home' => $this->container->router->pathFor('home'),
         ];
 
-        $this->view->render($response, 'home.twig',
+        return $this->view->render($response, 'home.twig',
             [
                 'title' => 'Home',
                 'transactions'=>$txs,

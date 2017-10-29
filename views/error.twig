@@ -1,0 +1,19 @@
+{% extends 'app.twig' %}
+
+{% block content %}
+    <h1 class="title">{{ title }}</h1>
+
+    <div class="notification is-{{ severity }}">
+        {{ error }}
+    </div>
+
+    {% if info %}
+        <p class="level">{{ info }}</p>
+    {% endif %}
+
+    {% if details %}
+        <pre>{{ details }}</pre>
+    {% endif %}
+
+
+{% endblock %}
