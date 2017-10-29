@@ -13,5 +13,8 @@
         "psr-4": {
             "splitbrain\\TheBankster\\": "src"
         }
+    },
+    "scripts": {
+        "post-autoload-dump": "bin/migrate.php"
     }
 }
