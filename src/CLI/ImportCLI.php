@@ -9,7 +9,7 @@ use splitbrain\TheBankster\Backend\AbstractBackend;
 use splitbrain\TheBankster\Container;
 use splitbrain\TheBankster\Entity\Transaction;
 
-class Import extends PSR3CLI
+class ImportCLI extends PSR3CLI
 {
 
     /**
