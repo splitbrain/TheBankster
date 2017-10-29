@@ -4,7 +4,7 @@
 
 {% block content %}
     <h1 class="title">{{ title }}</h1>
-    <div id="chart_div" style="width:100%; height:600px;"></div>
+    <div id="chart_div" style="width:100%; min-height:500px;"></div>
 
     <h2 class="subtitle">{{ subtitle }}</h2>
     {% include 'partial/transactions.twig' %}
@@ -24,9 +24,6 @@
             var zoom = {{ zoom }};
 
             var options = {
-                chartArea: {
-                    width: '50%'
-                },
                 isStacked: true,
                 backgroundColor: {fill: 'transparent'},
                 bars: 'horizontal',
@@ -59,5 +56,7 @@
                 window.location.href = newloc;
             });
         }
+
+        window.addEventListener('resize', drawBasic);
     </script>
 {% endblock script %}
