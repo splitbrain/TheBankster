@@ -7,6 +7,7 @@ use ORM\QueryBuilder\QueryBuilder;
 use splitbrain\phpcli\PSR3CLI;
 use splitbrain\TheBankster\Backend\AbstractBackend;
 use splitbrain\TheBankster\Container;
+use splitbrain\TheBankster\Entity\Rule;
 use splitbrain\TheBankster\Entity\Transaction;
 
 class ImportCLI extends PSR3CLI
@@ -20,7 +21,7 @@ class ImportCLI extends PSR3CLI
      */
     protected function setup(\splitbrain\phpcli\Options $options)
     {
-        $options->setHelp('fetch the statements');
+        $options->setHelp('Fetch new transactions and categorize them');
     }
 
     /**
@@ -56,6 +57,8 @@ class ImportCLI extends PSR3CLI
             );
             $backend->importTransactions($last);
         }
+
+        $this->applyRules($db);
     }
 
     /**
@@ -81,5 +84,36 @@ class ImportCLI extends PSR3CLI
         $dt->setTime(0, 0, 1);
 
         return $dt;
+    }
+
+    /**
+     * Run rules on all non-categorized transactions
+     *
+     * @param EntityManager $db
+     */
+    protected function applyRules(EntityManager $db)
+    {
+        /** @var Rule[] $rules */
+        $rules = $db->fetch(Rule::class)
+            ->where('enabled', '=', 1)
+            ->all();
+
+        $count = 0;
+        foreach ($rules as $rule) {
+            /** @var Transaction[] $txs */
+            $txs = $rule->matchTransactionsQuery()
+                ->where('category_id IS NULL')
+                ->all();
+
+            foreach ($txs as $tx) {
+                $tx->category_id = $rule->category_id;
+                $tx->save();
+                $this->notice('Rule {id} matched: ' . (string)$tx, ['id' => $rule->id]);
+                $count++;
+            }
+        }
+        if($count) {
+            $this->success('Automatically categorized {num} transactions.', ['num' => $count]);
+        }
     }
 }
