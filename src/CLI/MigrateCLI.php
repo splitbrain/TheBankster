@@ -48,6 +48,8 @@ class MigrateCLI extends PSR3CLI
         foreach ($upgrades as $version => $file) {
             $this->applyUpgrade($db->getConnection(), $file, $version);
         }
+
+        $db->getSqlHelper()->exec('VACUUM');
     }
 
     /**
@@ -88,7 +90,7 @@ class MigrateCLI extends PSR3CLI
             $file = basename($file);
             if (!preg_match('/^(\d+)/', $file, $m)) continue;
             if ((int)$m[1] <= $current) continue;
-            $upgrades[(int) $m[1]] = $file;
+            $upgrades[(int)$m[1]] = $file;
         }
         return $upgrades;
     }
