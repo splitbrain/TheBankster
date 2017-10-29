@@ -7,6 +7,7 @@ use ORM\QueryBuilder\QueryBuilder;
 use splitbrain\phpcli\PSR3CLI;
 use splitbrain\TheBankster\Backend\AbstractBackend;
 use splitbrain\TheBankster\Container;
+use splitbrain\TheBankster\Entity\Account;
 use splitbrain\TheBankster\Entity\Rule;
 use splitbrain\TheBankster\Entity\Transaction;
 
@@ -38,20 +39,19 @@ class ImportCLI extends PSR3CLI
         $container->setLogger($this);
         $db = $container->db;
 
-        // FIXME we load this data from the database later
-        $config = $container->settings;
-
-        foreach ($config['accounts'] as $accid => $account) {
-            $class = '\\splitbrain\\TheBankster\\Backend\\' . $account['backend'];
+        /** @var Account $accounts */
+        $accounts = $db->fetch(Account::class)->all();
+        foreach ($accounts as $account) {
+            $class = '\\splitbrain\\TheBankster\\Backend\\' . $account->backend;
             /** @var AbstractBackend $backend */
-            $backend = new $class($account['config'], $accid);
+            $backend = new $class($account->configuration, $account->account);
             $backend->setLogger($this);
 
-            $last = $this->getLastUpdate($db, $accid);
+            $last = $this->getLastUpdate($db, $account->account);
             $this->notice(
                 'Importing {account} from {date}',
                 [
-                    'account' => $account['label'],
+                    'account' => $account->account,
                     'date' => $last->format('Y-m-d')
                 ]
             );
@@ -112,7 +112,7 @@ class ImportCLI extends PSR3CLI
                 $count++;
             }
         }
-        if($count) {
+        if ($count) {
             $this->success('Automatically categorized {num} transactions.', ['num' => $count]);
         }
     }

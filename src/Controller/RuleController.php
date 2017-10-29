@@ -5,6 +5,7 @@ namespace splitbrain\TheBankster\Controller;
 use Slim\Exception\NotFoundException;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use splitbrain\TheBankster\Entity\Account;
 use splitbrain\TheBankster\Entity\Category;
 use splitbrain\TheBankster\Entity\Rule;
 
@@ -29,7 +30,7 @@ class RuleController extends BaseController
             $rule = new Rule();
             try {
                 $this->applyPostData($rule, $request->getQueryParams());
-            } catch (\Exception $ignored){
+            } catch (\Exception $ignored) {
                 // we're only prefilling here
             }
         }
@@ -177,13 +178,13 @@ class RuleController extends BaseController
      */
     protected function getAccounts()
     {
-        $accounts = [];
-        $accounts[''] = '';
+        $accounts = $this->container->db->fetch(Account::class)->orderBy('account')->all();
+        $names[''] = '';
 
-        foreach ($this->container->settings['accounts'] as $key => $info) {
-            $accounts[$key] = $info['label'];
+        foreach ($accounts as $account) {
+            $names[$account->account] = $account->account;
         }
-        return $accounts;
+        return $names;
     }
 
 }

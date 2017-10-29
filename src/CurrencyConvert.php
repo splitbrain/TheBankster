@@ -27,11 +27,10 @@ class CurrencyConvert
 
     /**
      * CurrencyConvert constructor.
-     * @param string $main The main currency
      */
-    public function __construct($main = 'EUR')
+    public function __construct()
     {
-        $this->main = 'EUR';
+        $this->main = Container::getInstance()->settings['currency'];
         $this->rates[$this->main] = 1.0; // self conversion
     }
 
