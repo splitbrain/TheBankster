@@ -9,6 +9,8 @@ The principle is simple:
 * you define rules how transactions should be categorized
 * you gain invaluable insights (aka. pretty graphs) about yourself and your finances
 
+![Screenshot](screenshot.png)
+
 ## Installation and Setup
 
 **DO NOT INSTALL THIS ON A SERVER ON THE INTERNET!** Seriously. This is meant to be used as a personal tool. There is absolutely no concept of user accounts, logins or any other safety stuff. Put this on a Raspberry at your home, but do **not** make it available from the Internet. You have been warned.
@@ -119,11 +121,12 @@ If you need different currencies you need to add their exchange rates in the `Cu
 * Did I mention that this is not supposed to be exposed to the Internet? Yes. Yes, I did
 * TheBankster is meant for your own personal finance overview only. It might work for a couple with shared finances, too.
 * TheBankster gives you information about how your income and spending is distributed. It does not tell you your actual balance on any of your accounts. That's kinda by design. It would also be really hard to do.
-* Even if you don't use this, check out the cool libraries I used in the `composer.json` file, you might find a gem you didn't know. (If your'e into PHP that is)
+* Even if you don't use this, check out the cool libraries I used in the `composer.json` file, you might find a gem you didn't know. (If you're into PHP that is)
+* There are a few more command line tools in the `bin` directory. I used them during development before the web interface existed. Call them with `--help` to see what they do. But the web interface is probably better now.
  
 ### License (MIT)
  
-Copyright 2017 Andreas Gohr
+Copyright 2017 [Andreas Gohr](https://www.splitbrain.org)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
