@@ -72,7 +72,7 @@ class ErrorHandler
                 'title' => 'Not Found',
                 'breadcrumbs' => $breadcrumbs,
                 'severity' => 'warning',
-                'error' => 'The resource your\'e looking for does not exist',
+                'error' => 'The resource you\'re looking for does not exist.',
             ]
         )->withStatus(404);
     }
