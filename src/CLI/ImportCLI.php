@@ -44,7 +44,7 @@ class ImportCLI extends PSR3CLI
         $args = $options->getArgs();
 
         /** @var Account $accounts */
-        if($args) {
+        if ($args) {
             $accounts = $db->fetch(Account::class)->where('account', '=', $args[0])->all();
         } else {
             $accounts = $db->fetch(Account::class)->all();
@@ -63,7 +63,14 @@ class ImportCLI extends PSR3CLI
                     'date' => $last->format('Y-m-d')
                 ]
             );
-            $backend->importTransactions($last);
+
+            try {
+                $backend->importTransactions($last);
+            } catch (\Exception $e) {
+                $this->error("Account {acct} threw an Exception:", ['acct' => $account->account]);
+                $this->debug($account->account . ': ' . $e->getTraceAsString());
+                $this->error($e->getMessage());
+            }
         }
 
         $this->applyRules($db);
