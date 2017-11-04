@@ -21,11 +21,13 @@ To install simply clone this repository and run [composer](https://getcomposer.o
 
 ### Accounts
 
-Use the webinterface to set up your bank accounts. There are currenly 3 backends supported:
+Use the webinterface to set up your bank accounts. There are currenly 4 backends supported:
 
 **FinTS** - The HBCI/FinTS banking standard common in Germany (and Europe). Most major banks support this. Try [this site](https://www.hbci-zka.de/institute/institut_select.php) for figuring out if your bank does.
 
 **Paypal** - You need to create an [API access user](https://www.paypal.com/de/cgi-bin/webscr?cmd=_profile-api-add-direct-access-show) at Paypal to fetch your transactions.
+
+**GoogleSheets** - This allows you to import expenses from a [Google Sheets](https://docs.google.com/spreadsheets/) spreadsheet. The sheet has to be made readable for everyone with the link. Check out [TheCashster](https://github.com/splitbrain/TheCashster) for an Android Expense tracker working with Google Sheets. 
 
 **TargoBank** - My credit card's bank does not support FinTS so I wrote this backend to fetch the data from their online banking site. This is the most hacky backend but might give you an idea how to add your own backend. It can only download transactions of the current month.
 
