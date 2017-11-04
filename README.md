@@ -25,11 +25,17 @@ Use the webinterface to set up your bank accounts. There are currenly 4 backends
 
 **FinTS** - The HBCI/FinTS banking standard common in Germany (and Europe). Most major banks support this. Try [this site](https://www.hbci-zka.de/institute/institut_select.php) for figuring out if your bank does.
 
-**Paypal** - You need to create an [API access user](https://www.paypal.com/de/cgi-bin/webscr?cmd=_profile-api-add-direct-access-show) at Paypal to fetch your transactions.
+**Paypal** - You need to create an [API access user](https://www.paypal.com/de/cgi-bin/webscr?cmd=_profile-api-add-direct-access-show) at Paypal to fetch your transactions. Be sure to create a rule to skip bank statements of money moving to or from paypal to avoid double tracking.
 
 **GoogleSheets** - This allows you to import expenses from a [Google Sheets](https://docs.google.com/spreadsheets/) spreadsheet. The sheet has to be made readable for everyone with the link. Check out [TheCashster](https://github.com/splitbrain/TheCashster) for an Android Expense tracker working with Google Sheets. 
 
 **TargoBank** - My credit card's bank does not support FinTS so I wrote this backend to fetch the data from their online banking site. This is the most hacky backend but might give you an idea how to add your own backend. It can only download transactions of the current month.
+
+**AmazonMail** - This is another weird one. Because Amazon has no proper API, but I buy a lot of stuff from them. This logs into an IMAP mail account and looks for order confirmation and confirmed refund emails from Amazon. This information is then used to create transactions based on your Amazon purchases. When using this, you should create a rule to skip Amazon transactions in your bank account to avoid tracking spendings twice (assign to category `-/-`).
+ 
+ Please note: this currently only supports Amazon.de with E-Mails in German. Please also note: I do not handle things you buy with vouchers, eg. the transaction will use the full item price. See it that way: if Grandma had given you cash instead of a voucher you'd want to track what you buy for as an expense, too. But maybe manually add received vouchers as income somewhere? 
+
+.
 
 If you add your own backend, feel free to send a pull request.
 
@@ -98,7 +104,7 @@ Note: because I'm lazy, the new manually assigned category will only show up aft
  
 ### Amazon.de Support
  
-Okay, so I'm buying a lot of my stuff at Amazon. Unfortunately there seems to be no API to access my orders (feel free to correct me). So the best next thing I could come is automatically linking Amazon order numbers to their respective order overview at Amazon.de. Watch out for the `🔍` symbol in the transaction description.
+Okay, so I mentioned that I buy a lot of my stuff at Amazon. So next to the weird IMAP based backend, TheBankster also automatically links Amazon order numbers to their respective order overview at Amazon.de. Watch out for the `🔍` symbol in the transaction description.
  
 Yes, Amazon.de only. Because I can't really test anything else. Pull Request?
  
