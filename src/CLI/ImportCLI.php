@@ -23,6 +23,8 @@ class ImportCLI extends PSR3CLI
     protected function setup(\splitbrain\phpcli\Options $options)
     {
         $options->setHelp('Fetch new transactions and categorize them');
+
+        $options->registerArgument('account', 'The account to import, leave blank for all', false);
     }
 
     /**
@@ -39,8 +41,14 @@ class ImportCLI extends PSR3CLI
         $container->setLogger($this);
         $db = $container->db;
 
+        $args = $options->getArgs();
+
         /** @var Account $accounts */
-        $accounts = $db->fetch(Account::class)->all();
+        if($args) {
+            $accounts = $db->fetch(Account::class)->where('account', '=', $args[0])->all();
+        } else {
+            $accounts = $db->fetch(Account::class)->all();
+        }
         foreach ($accounts as $account) {
             $class = '\\splitbrain\\TheBankster\\Backend\\' . $account->backend;
             /** @var AbstractBackend $backend */
