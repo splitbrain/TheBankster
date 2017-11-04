@@ -108,10 +108,16 @@ class Container extends \Slim\Container
      * @param string $errstr
      * @param string $errfile
      * @param int $errline
+     * @return bool
      * @throws \ErrorException
      */
     public function errorHandler(int $errno, string $errstr, string $errfile, int $errline)
     {
+        if (!(error_reporting() & $errno)) {
+            // This error code is not included in error_reporting, so let it fall
+            // through to the standard PHP error handler
+            return false;
+        }
         throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
     }
 
