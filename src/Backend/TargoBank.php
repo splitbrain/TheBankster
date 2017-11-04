@@ -76,7 +76,8 @@ class TargoBank extends AbstractBackend
         $table = pq('table[summary="Activity Details"]');
 
         if ($table->length !== 1) {
-            throw new \Exception('Failed to parse account statements');
+            $this->logger->warning('Seems like there are no statements available for this month');
+            return;
         }
 
         $trs = $table->find('tr');
