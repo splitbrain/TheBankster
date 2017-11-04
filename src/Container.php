@@ -2,7 +2,6 @@
 
 namespace splitbrain\TheBankster;
 
-use manuelodelain\Twig\Extension\LinkifyExtension;
 use ORM\DbConfig;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -50,6 +49,8 @@ class Container extends \Slim\Container
         // default logger
         $this->logger = new NullLogger();
 
+        // we want exceptions
+        set_error_handler([$this, 'errorHandler']);
 
         // DataBase Entity Manager (always initialized)
         $this['db'] = new EntityManager([
@@ -98,6 +99,20 @@ class Container extends \Slim\Container
                 return (new ErrorHandler($c))->notFound($request, $response);
             };
         };
+    }
+
+    /**
+     * Error handler to convert old school warnings, notices, etc to exceptions
+     *
+     * @param int $errno
+     * @param string $errstr
+     * @param string $errfile
+     * @param int $errline
+     * @throws \ErrorException
+     */
+    public function errorHandler(int $errno, string $errstr, string $errfile, int $errline)
+    {
+        throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
     }
 
     /**
