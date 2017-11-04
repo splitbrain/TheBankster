@@ -7,6 +7,13 @@ use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\RequestOptions;
 use splitbrain\TheBankster\Entity\Transaction;
 
+/**
+ * Class TargoBank
+ *
+ * Imports credit card transactions from TargoBank by scraping the web interface
+ *
+ * @package splitbrain\TheBankster\Backend
+ */
 class TargoBank extends AbstractBackend
 {
     protected $jar;

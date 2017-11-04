@@ -4,6 +4,13 @@ namespace splitbrain\TheBankster\Backend;
 
 use splitbrain\TheBankster\Entity\Transaction;
 
+/**
+ * Class FinTS
+ *
+ * Uses the FinTS protocol to access bank transactions
+ *
+ * @package splitbrain\TheBankster\Backend
+ */
 class FinTS extends AbstractBackend
 {
 
