@@ -93,6 +93,9 @@ class FinTS extends AbstractBackend
     {
         $account = $this->identifyAccount();
 
+        $today = new \DateTime();
+        $today->setTime(0,0,0);
+
         // get all the transactions
         $soa = $this->fints->getStatementOfAccount($account, $since, new \DateTime());
         foreach ($soa->getStatements() as $statement) {
@@ -113,6 +116,12 @@ class FinTS extends AbstractBackend
                 $tx->xName = $fintrans->getName();
                 $tx->xBank = $fintrans->getBankCode();
                 $tx->xAcct = $fintrans->getAccountNumber();
+
+                if ($tx->datetime > $today) {
+                    $this->logger->warning('Skipping future transaction '.((string) $tx));
+                    continue;
+                }
+
                 $this->storeTransaction($tx);
             }
         }
