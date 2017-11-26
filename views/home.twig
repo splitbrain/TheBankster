@@ -1,7 +1,19 @@
 {% extends 'app.twig' %}
+{% import 'macro/form.twig' as form %}
 
 {% block content %}
     <h1 class="title">{{ title }}</h1>
+
+    <form action="{{ path_for('home') }}">
+
+        {{ form.input(
+        'Search',
+        'q',
+        'Search in description, issuer name and issuer bank',
+        query
+        ) }}
+
+    </form>
 
     {% include 'partial/transactions.twig' %}
 {% endblock %}

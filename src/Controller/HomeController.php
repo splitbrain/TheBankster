@@ -16,24 +16,58 @@ class HomeController extends BaseController
      */
     public function __invoke(Request $request, Response $response)
     {
-        $beginOfMonth = strtotime('first day of this month 00:00');
-        $txs = $this->container->db
-            ->fetch(Transaction::class)
-            ->where('ts', '>', $beginOfMonth)
-            ->orderBy('ts', 'DESC')
-            ->all();
-
         $breadcrumbs = [
             'Home' => $this->container->router->pathFor('home'),
         ];
 
+        $query = $request->getQueryParam('q');
+        if ($query) {
+            $txs = $this->search($query);
+            $breadcrumbs["🔍 $query"] = $this->container->router->pathFor('home', [], ['q' => $query]);
+        } else {
+            $txs = $this->thisMonth();
+        }
+
         return $this->view->render($response, 'home.twig',
             [
                 'title' => 'Home',
-                'transactions'=>$txs,
+                'transactions' => $txs,
                 'categories' => Category::formList(),
                 'breadcrumbs' => $breadcrumbs,
+                'query' => $query,
             ]
         );
+    }
+
+    /**
+     * Search for a transaction
+     *
+     * @param $query
+     * @return Transaction[]
+     */
+    protected function search($query)
+    {
+        return $this->container->db
+            ->fetch(Transaction::class)
+            ->where('description', 'LIKE', "%$query%")
+            ->orWhere('x_name', 'LIKE', "%$query%")
+            ->orWhere('x_bank', 'LIKE', "%$query%")
+            ->orderBy('ts', 'DESC')
+            ->all();
+    }
+
+    /**
+     * Get this month's transactions
+     *
+     * @return Transaction[]
+     */
+    protected function thisMonth()
+    {
+        $beginOfMonth = strtotime('first day of this month 00:00');
+        return $this->container->db
+            ->fetch(Transaction::class)
+            ->where('ts', '>', $beginOfMonth)
+            ->orderBy('ts', 'DESC')
+            ->all();
     }
 }
