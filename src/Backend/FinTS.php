@@ -122,6 +122,11 @@ class FinTS extends AbstractBackend
                     continue;
                 }
 
+                if ($tx->datetime < $since) {
+                    $this->logger->warning('Skipping too old transaction '.((string) $tx));
+                    continue;
+                }
+
                 $this->storeTransaction($tx);
             }
         }
