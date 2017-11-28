@@ -23,7 +23,7 @@ class ImportCLI extends PSR3CLI
     protected function setup(\splitbrain\phpcli\Options $options)
     {
         $options->setHelp('Fetch new transactions and categorize them');
-
+        $options->registerOption('from', 'Import from this date', 'f', 'YYYY-MM-DD');
         $options->registerArgument('account', 'The account to import, leave blank for all', false);
     }
 
@@ -43,6 +43,9 @@ class ImportCLI extends PSR3CLI
 
         $args = $options->getArgs();
 
+        $from = $options->getOpt('from', '');
+        if($from) $from = new \DateTime($from);
+
         /** @var Account $accounts */
         if ($args) {
             $accounts = $db->fetch(Account::class)->where('account', '=', $args[0])->all();
@@ -55,7 +58,11 @@ class ImportCLI extends PSR3CLI
             $backend = new $class($account->configuration, $account->account);
             $backend->setLogger($this);
 
-            $last = $this->getLastUpdate($db, $account->account);
+            if($from) {
+                $last = $from;
+            } else {
+                $last = $this->getLastUpdate($db, $account->account);
+            }
             $this->notice(
                 'Importing {account} from {date}',
                 [
