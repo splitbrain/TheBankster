@@ -7,6 +7,7 @@ use splitbrain\TheBankster\Controller\CategoryController;
 use splitbrain\TheBankster\Controller\ChartController;
 use splitbrain\TheBankster\Controller\HomeController;
 use splitbrain\TheBankster\Controller\RuleController;
+use splitbrain\TheBankster\Controller\SearchController;
 use splitbrain\TheBankster\Controller\TransactionController;
 
 
@@ -66,6 +67,7 @@ class App
         $this->app->get('/uncategorized', TransactionController::class . ':uncategorized')->setName('uncategorized');
         $this->app->get('/assign/{txid}/{catid}', TransactionController::class . ':assign')->setName('assign');
 
+        $this->app->any('/search', SearchController::class)->setName('search');
         $this->app->get('/', HomeController::class)->setName('home');
 
         $this->app->run();

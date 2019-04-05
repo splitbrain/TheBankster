@@ -1,0 +1,89 @@
+{% extends 'app.twig' %}
+{% import 'macro/form.twig' as form %}
+
+{% block content %}
+    <h1 class="title">{{ title }}</h1>
+
+    <form action="{{ path_for('search') }}" method="post">
+        <div class="columns box">
+            <div class="column">
+                {{ form.dropdown(
+                    'Account',
+                    'account',
+                    '',
+                    accounts,
+                    query.account
+                ) }}
+                {{ form.input(
+                    'Description',
+                    'description',
+                    '',
+                    query.description
+                ) }}
+                {{ form.input(
+                    'Issuer Name',
+                    'x_name',
+                    '',
+                    query.xName
+                ) }}
+                {{ form.input(
+                    'Issuer Bank',
+                    'x_bank',
+                    '',
+                    query.xBank
+                ) }}
+                {{ form.input(
+                    'Issuer Account',
+                    'x_acct',
+                    '',
+                    query.xAcct
+                ) }}
+            </div>
+
+            <div class="column">
+                {{ form.deepDropdown(
+                    'Category',
+                    'categoryId',
+                    '',
+                    categories,
+                    query.categoryId
+                ) }}
+
+                {{ form.input(
+                    'Minimum Amount',
+                    'min',
+                    '',
+                    query.min
+                ) }}
+
+                {{ form.input(
+                    'Maximum Amount',
+                    'max',
+                    '',
+                    query.max
+                ) }}
+
+                {{ form.input(
+                    'From Date',
+                    'from',
+                    '',
+                    query.from,
+                    'date'
+                ) }}
+
+                {{ form.input(
+                    'Until Date',
+                    'until',
+                    '',
+                    query.until,
+                    'date'
+                ) }}
+
+
+                <button class="button is-primary" type="submit">Search</button>
+            </div>
+        </div>
+    </form>
+
+    {% include 'partial/transactions.twig' %}
+{% endblock %}

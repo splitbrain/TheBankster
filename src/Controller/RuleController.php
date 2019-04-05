@@ -61,7 +61,7 @@ class RuleController extends BaseController
 
         return $this->view->render($response, 'rule.twig', [
             'title' => $title,
-            'accounts' => $this->getAccounts(),
+            'accounts' => Account::formList(),
             'categories' => Category::formList(),
             'rule' => $rule,
             'error' => $error,
@@ -169,22 +169,6 @@ class RuleController extends BaseController
             $rule->categoryId = $post['categoryId'];
         }
         if (!$ok) throw new \Exception('You need to provide at least one matching rule');
-    }
-
-    /**
-     * Get list of available accounts
-     *
-     * @return array
-     */
-    protected function getAccounts()
-    {
-        $accounts = $this->container->db->fetch(Account::class)->orderBy('account')->all();
-        $names[''] = '';
-
-        foreach ($accounts as $account) {
-            $names[$account->account] = $account->account;
-        }
-        return $names;
     }
 
 }

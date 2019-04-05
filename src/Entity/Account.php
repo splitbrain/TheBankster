@@ -4,6 +4,7 @@ namespace splitbrain\TheBankster\Entity;
 
 use ORM\Entity;
 use splitbrain\TheBankster\Backend\AbstractBackend;
+use splitbrain\TheBankster\Container;
 
 class Account extends Entity
 {
@@ -109,5 +110,21 @@ class Account extends Entity
         }
 
         return $result;
+    }
+
+    /**
+     * Get list of available accounts
+     *
+     * @return array
+     */
+    static public function formList()
+    {
+        $accounts = Container::getInstance()->db->fetch(Account::class)->orderBy('account')->all();
+        $names[''] = '';
+
+        foreach ($accounts as $account) {
+            $names[$account->account] = $account->account;
+        }
+        return $names;
     }
 }

@@ -8,7 +8,9 @@
                    value="{{ value }}"
                    id="{{ name }}"/>
         </div>
-        <p class="help">{{ help | autolink }}</p>
+        {% if help %}
+            <p class="help">{{ help | autolink }}</p>
+        {% endif %}
     </div>
 {% endmacro %}
 
@@ -24,7 +26,9 @@
                 </select>
             </div>
         </div>
-        <p class="help">{{ help | autolink }}</p>
+        {% if help %}
+            <p class="help">{{ help | autolink }}</p>
+        {% endif %}
     </div>
 {% endmacro %}
 
@@ -38,13 +42,15 @@
                         <optgroup label="{{ group }}">
                             {% for key,val in sub %}
                                 <option value="{{ key }}"
-                                        {% if key == value %}selected="selected"{% endif %}>{{ val }}</option>
+                                        {% if key == value and key|length == value|length %}selected="selected"{% endif %}>{{ val }}</option>
                             {% endfor %}
                         </optgroup>
                     {% endfor %}
                 </select>
             </div>
         </div>
-        <p class="help">{{ help | autolink }}</p>
+        {% if help %}
+            <p class="help">{{ help | autolink }}</p>
+        {% endif %}
     </div>
 {% endmacro %}
