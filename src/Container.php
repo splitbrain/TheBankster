@@ -70,7 +70,7 @@ class Container extends \Slim\Container
             ]);
 
             $view->getEnvironment()->addFilter(
-                new \Twig_Filter(
+                new \Twig\TwigFilter(
                     'autolink',
                     'autolink',
                     [
