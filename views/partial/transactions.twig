@@ -1,42 +1,54 @@
-<table class="table is-striped is-hoverable is-fullwidth">
-    <thead>
-    <tr>
-        <th>Account</th>
-        <th>Date</th>
-        <th>Amount</th>
-        <th>Description</th>
-        <th>Issuer Name</th>
-        <th>Issuer Bank<br/>Issuer Account</th>
-        <th>Category</th>
-        <th></th>
-    </tr>
-    </thead>
-
-    <tbody>
-    {% for tx in transactions %}
-        <tr {% if tx.category.top == '-' %}style="opacity: 0.3"{% endif %}>
-            <td>{{ tx.account }}</td>
-            <td>{{ tx.datetime.format('Y-m-d') }}</td>
-            <td class="has-text-right {% if tx.amount < 0 %}has-text-danger{% else %}has-text-success{% endif %}">{{ "%.2f"|format(tx.amount) }}</td>
-            <td class="tx-description">{{ tx.cleanDescription|nl2br }}</td>
-            <td>{{ tx.xName }}</td>
-            <td>{{ [tx.xBank, tx.xAcct] | join("\n") |nl2br }}</td>
-            <td>
-                {% if tx.category.label %}
-                    <a href="{{ path_for('chart', {'top': tx.category.top}) }}">{{ tx.category.top }}</a><br/>
-                    ↳<a href="{{ path_for('chart', {'top': tx.category.top, 'sub': tx.category.label }) }}">{{ tx.category.label }}</a>
-                {% else %}
-                    <a href="{{ path_for('rule') }}?{{ {
-                        'account': tx.account,
-                        'description': tx.cleanDescription|replace({"\n": ' '}),
-                        'xName': tx.xName,
-                        'xBank': tx.xBank,
-                        'xAcct': tx.xAcct
-                    } |url_encode }}" title="create rule">+</a>
-                {% endif %}
-            </td>
-            <td><a class="assign-category" data-txid="{{ tx.id }}" href="#" title="change category">↻</a></td>
+<div class="tabs">
+    <ul>
+        <li class="is-active"><a href="#tab-table">Table</a></li>
+        <li><a href="#tab-tsv">TSV</a></li>
+    </ul>
+</div>
+<div class="tabbed-content">
+    <table class="table is-striped is-hoverable is-fullwidth" id="tab-table">
+        <thead>
+        <tr>
+            <th>Account</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Description</th>
+            <th>Issuer Name</th>
+            <th>Issuer Bank<br/>Issuer Account</th>
+            <th>Category</th>
+            <th></th>
         </tr>
-    {% endfor %}
-    </tbody>
-</table>
+        </thead>
+
+        <tbody>
+        {% for tx in transactions %}
+            <tr {% if tx.category.top == '-' %}style="opacity: 0.3"{% endif %}>
+                <td>{{ tx.account }}</td>
+                <td>{{ tx.datetime.format('Y-m-d') }}</td>
+                <td class="has-text-right {% if tx.amount < 0 %}has-text-danger{% else %}has-text-success{% endif %}">{{ "%.2f"|format(tx.amount) }}</td>
+                <td class="tx-description">{{ tx.cleanDescription|nl2br }}</td>
+                <td>{{ tx.xName }}</td>
+                <td>{{ [tx.xBank, tx.xAcct] | join("\n") |nl2br }}</td>
+                <td>
+                    {% if tx.category.label %}
+                        <a href="{{ path_for('chart', {'top': tx.category.top}) }}">{{ tx.category.top }}</a><br/>
+                        ↳<a href="{{ path_for('chart', {'top': tx.category.top, 'sub': tx.category.label }) }}">{{ tx.category.label }}</a>
+                    {% else %}
+                        <a href="{{ path_for('rule') }}?{{ {
+                            'account': tx.account,
+                            'description': tx.cleanDescription|replace({"\n": ' '}),
+                            'xName': tx.xName,
+                            'xBank': tx.xBank,
+                            'xAcct': tx.xAcct
+                        } |url_encode }}" title="create rule">+</a>
+                    {% endif %}
+                </td>
+                <td><a class="assign-category" data-txid="{{ tx.id }}" href="#" title="change category">↻</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <pre class="is-hidden" id="tab-tsv">
+Account&#9;Date&#9;Amount&#9;Issuer Name&#9;Issuer Bank&#9;Issuer Account&#9;Category&#9;Description
+{% for tx in transactions|reverse %}{{ tx.asTSV }}{% endfor %}
+    </pre>
+</div>

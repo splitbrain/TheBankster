@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
+// Autolink Amazon.de order IDs
 document.addEventListener('DOMContentLoaded', function () {
     var elements = Array.prototype.slice.call(document.getElementsByClassName('tx-description'), 0);
     elements.forEach(function (el) {
@@ -107,5 +108,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
             console.log(matches);
         }
+    });
+});
+
+// handle tabs
+document.addEventListener('DOMContentLoaded', function () {
+    const tabs = document.querySelectorAll('.tabs li a');
+    const tabContentBoxes = document.querySelectorAll('.tabbed-content > *');
+    tabs.forEach((tab) => {
+        tab.addEventListener('click', (e) => {
+            e.preventDefault();
+            tabs.forEach((item) => item.parentNode.classList.remove('is-active'));
+            tabContentBoxes.forEach((item) => item.classList.add('is-hidden'));
+            document.querySelector(tab.getAttribute('href')).classList.remove('is-hidden');
+            tab.parentNode.classList.add('is-active');
+        });
     });
 });

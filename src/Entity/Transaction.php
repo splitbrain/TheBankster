@@ -89,4 +89,28 @@ class Transaction extends \ORM\Entity
 
         return join("\n", $lines);
     }
+
+    /**
+     * Return the transaction as TSV
+     *
+     * @return string
+     */
+    public function asTSV() {
+        $cat = $this->category;
+        if($cat) {
+            $cat = $cat->getFullName();
+        } else {
+            $cat = 'none';
+        }
+
+        return
+            $this->account . "\t" .
+            $this->datetime->format('Y-m-d H:i') . "\t" .
+            sprintf('%.2f', $this->amount) . "\t" .
+            $this->x_name . "\t" .
+            $this->x_bank . "\t" .
+            $this->x_acct . "\t" .
+            $cat ."\t".
+            preg_replace('/[\r\n\t]+/', ' ', $this->getCleanDescription()) . "\n";
+    }
 }
